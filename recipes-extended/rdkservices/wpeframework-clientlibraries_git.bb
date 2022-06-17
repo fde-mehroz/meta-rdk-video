@@ -36,6 +36,7 @@ DEPENDS = " \
 RDEPENDS_${PN}_append_dunfell = "${@bb.utils.contains('DISTRO_FEATURES', 'sage_svp', ' gst-svp-ext', '', d)}"
 RDEPENDS_${PN}_append_dunfell = "${@bb.utils.contains('DISTRO_FEATURES', 'rdk_svp', ' gst-svp-ext', '', d)}"
 RDEPENDS_${PN}_append_dunfell += " wpeframework"
+RDEPENDS_${PN}_append_dunfell += " rdkperf"
 
 #Cryptography library 
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'enable_icrypto_openssl','openssl', 'virtual/secapi', d)}"

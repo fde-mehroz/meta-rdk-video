@@ -7,6 +7,8 @@ SRCREV_FORMAT = "gst"
 # need gstreamer-plugins-soc for brcmsvpmeta
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'sage_svp', 'gstreamer-plugins-soc', '', d)}"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'gstreamer1', 'gstreamer1.0', 'gstreamer', d)}"
+DEPENDS += " rdkperf"
+RDEPENDS_${PN} += " rdkperf"
 
 SRC_URI = "${RDK_GENERIC_ROOT_GIT}/gst_svp_ext/generic;protocol=${RDK_GIT_PROTOCOL};branch=${RDK_GIT_BRANCH};name=gst"
 
@@ -27,7 +29,7 @@ do_install() {
         install -m 0755 ${S}/libgstsvpext.so        ${D}/${libdir}
         install -m 0644 ${S}/gst_svp_meta.h         ${D}/usr/include
         install -m 0644 ${S}/gst_svp_performance.h  ${D}/usr/include
-        install -m 0644 ${S}/GstPerf.h              ${D}/usr/include
+        #install -m 0644 ${S}/GstPerf.h              ${D}/usr/include
 }
 
 
