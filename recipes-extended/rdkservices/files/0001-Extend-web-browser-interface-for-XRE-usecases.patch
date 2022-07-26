@@ -1,0 +1,113 @@
+From 685baabc5438fb328f4d532586d62edc2b47397c Mon Sep 17 00:00:00 2001
+From: Eugene Mutavchi <Ievgen_Mutavchi@comcast.com>
+Date: Mon, 25 Jul 2022 12:36:54 +0000
+Subject: [PATCH] Extend web browser interface for XRE/X1 usecases
+
+---
+ interfaces/IBrowser.h | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+Index: git/interfaces/IBrowser.h
+===================================================================
+--- git.orig/interfaces/IBrowser.h
++++ git/interfaces/IBrowser.h
+@@ -201,5 +201,43 @@ namespace Exchange {
+         virtual uint32_t MixedContentPolicy(MixedContentPolicyType& policy /* @out */) const = 0;
+         virtual uint32_t MixedContentPolicy(const MixedContentPolicyType policy) = 0;
+     };
++
++    /* @json @extended */
++    struct EXTERNAL IBrowserScripting : virtual public Core::IUnknown {
++        enum { ID = ID_BROWSER_SCRIPTING };
++
++        // @brief Run javascript in main frame.
++        // @param script Utf8 encoded string.
++        virtual uint32_t RunJavaScript(const string& script) = 0;
++
++        // @brief Add user script to be executed at document start.
++        // @param script Utf8 encoded string.
++        virtual uint32_t AddUserScript(const string& script, const bool topFrameOnly) = 0;
++
++        // @brief Remove all user scripts.
++        virtual uint32_t RemoveAllUserScripts() = 0;
++    };
++
++    /* @json */
++    struct EXTERNAL IBrowserCookieJar : virtual public Core::IUnknown {
++        enum { ID = ID_BROWSER_COOKIEJAR };
++
++        /* @event */
++        struct INotification : virtual public Core::IUnknown {
++            enum { ID = ID_BROWSER_COOKIEJAR_NOTIFICATION };
++
++            // @brief Notifies that cookies were added, removed or modified.
++            virtual void CookieJarChanged() = 0;
++        };
++
++        virtual void Register(INotification* sink) = 0;
++        virtual void Unregister(INotification* sink) = 0;
++
++        /* @json:omit */
++        virtual uint32_t CookieJar(uint32_t& version /* @out */, uint32_t& checksum /* @out */, string& payload /* @out */) const = 0;
++        /* @json:omit */
++        virtual uint32_t CookieJar(const uint32_t version, const uint32_t checksum, const string& payload) = 0;
++    };
++
+ }
+ }
+Index: git/interfaces/Ids.h
+===================================================================
+--- git.orig/interfaces/Ids.h
++++ git/interfaces/Ids.h
+@@ -243,6 +243,10 @@ namespace Exchange {
+         
+ 	ID_WATERMARK,
+         ID_WATERMARK_NOTIFICATION,
++
++        ID_BROWSER_SCRIPTING,
++        ID_BROWSER_COOKIEJAR,
++        ID_BROWSER_COOKIEJAR_NOTIFICATION,
+     };
+ }
+ }
+Index: git/jsonrpc/CookieJar.json
+===================================================================
+--- /dev/null
++++ git/jsonrpc/CookieJar.json
+@@ -0,0 +1,36 @@
++{
++  "$schema": "interface.schema.json",
++  "jsonrpc": "2.0",
++  "info": {
++    "class": "BrowserCookieJar",
++    "title": "Browser CookieJar API",
++    "description": "Browser CookieJar JSON-RPC interface"
++  },
++  "properties": {
++    "cookiejar": {
++      "summary": "User preferred languages",
++      "params": {
++        "type": "object",
++        "properties": {
++          "version": {
++            "description": "Version of payload format",
++            "type": "integer"
++          },
++          "checksum": {
++            "description": "The checksum of the string used for payload creation",
++             "type": "integer"
++          },
++          "payload": {
++            "description": "Base64 string representation of compressed and encrypted cookies",
++            "type": "string"
++          }
++        },
++        "required": [
++          "version",
++          "checksum",
++          "payload"
++        ]
++      }
++    }
++  }
++}
