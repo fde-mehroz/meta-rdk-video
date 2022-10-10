@@ -23,6 +23,7 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            file://0001-RDKTV-11792-increase-retry-count.patch \
            file://0001-SERXIONE-600-LocationSync-Network-check-timer.patch \
            file://0001-RDKTV-20749-Revert-Merge-pull-request-3336-from-npol.patch \
+	   file://0001-RDK-39924-Launch-Airplay-App-from-Airplay-icon-sel.patch \
           "
 
 # Mar 7, 2023
@@ -64,7 +65,7 @@ PACKAGECONFIG ?= " \
     activitymonitor avinput continuewatching controlservice voicecontrol datacapture devicediagnostics \
     displaysettings framerate hdcpprofile hdmicec hdmiinput loggingpreferences \
     messenger network remoteactionmapping screencapture securityagent stateobserver \
-    systemservices timer tracecontrol userpreferences warehouse monitor locationsync texttospeech persistent_store\
+    systemservices timer tracecontrol userpreferences warehouse monitor locationsync texttospeech persistent_store airplayservice \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluetoothcontrol', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'opencdm',              'opencdmi', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'playready_nexus_svp',  'opencdmi_prnx_svp', '', d)} \
@@ -145,6 +146,7 @@ PACKAGECONFIG[erm]                  = "-DBUILD_ENABLE_ERM=ON,-DBUILD_ENABLE_ERM=
 PACKAGECONFIG[fireboltmediaplayer]  = "-DPLUGIN_FIREBOLTMEDIAPLAYER=ON,-DPLUGIN_FIREBOLTMEDIAPLAYER=OFF, aamp, aamp"
 PACKAGECONFIG[dlna] = "-DPLUGIN_DLNA_SERVICE=ON, -DPLUGIN_DLNA_SERVICE=OFF,xupnp-rpc,xupnp-rpc"
 PACKAGECONFIG[mediaenginermf]     = "-DPLUGIN_MEDIAENGINERMF=ON,,rmfgeneric, rmfgeneric"
+PACKAGECONFIG[airplayservice]       = "-DPLUGIN_AIRPLAYSERVICE=ON,-DPLUGIN_PLUGIN_AIRPLAYSERVICE=OFF,"
 
 MONITOR_PLUGIN_ARGS                ?= " \
                                        -DPLUGIN_WEBKITBROWSER_MEMORYLIMIT=614400 \

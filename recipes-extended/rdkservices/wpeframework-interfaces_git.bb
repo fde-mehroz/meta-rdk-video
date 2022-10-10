@@ -13,6 +13,8 @@ SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch
            file://0001-Add-IFocus-iface.patch \
            file://0001-Revert-Merge-pull-request-137-from-mikolaj-staworzyn.patch \
            file://0001-Extend-web-browser-interface-for-XRE-usecases.patch \
+           file://0001-RDK-37042-Add-interfaces-for-Airplay-Plugin.patch \
+           file://0001-RDK-40478-Run-AirplayDaemon-as-thunder-plugin.patch \
            "
 
 # Sep 20, 2022
