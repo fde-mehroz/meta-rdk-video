@@ -43,13 +43,16 @@ DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'enable_icrypto_openssl','',
 DEPENDS +=  "${@bb.utils.contains('DISTRO_FEATURES', 'enable_icrypto_openssl',"", bb.utils.contains('DISTRO_FEATURES', 'netflix_cryptanium', 'virtual/secapi-crypto', "", d), d)}"
 CRYPTOGRAPHY_IMPLEMENTATION = "${@bb.utils.contains('DISTRO_FEATURES', 'enable_icrypto_openssl','OpenSSL', 'SecApi', d)}"
 
+# Moved "rdk_svp" before "sage_svp" so that the rdk_svp adapter will
+# have a higher precedence in the selection process and will be used on any
+# device that uses the rdk_svp distro flag.
 def get_cdmi_adapter(d):
     if bb.utils.contains("DISTRO_FEATURES", "nexus_svp", "true", "false", d) == "true":
         return "opencdmi_brcm_svp"
-    elif bb.utils.contains("DISTRO_FEATURES", "sage_svp", "true", "false", d) == "true":
-        return "opencdmi_comcast_svp"
     elif bb.utils.contains("DISTRO_FEATURES", "rdk_svp", "true", "false", d) == "true":
         return "opencdmi_rdk_svp"
+    elif bb.utils.contains("DISTRO_FEATURES", "sage_svp", "true", "false", d) == "true":
+        return "opencdmi_comcast_svp"
     else:
         return "opencdm_gst"
     fi
