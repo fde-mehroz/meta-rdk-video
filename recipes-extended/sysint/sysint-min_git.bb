@@ -47,7 +47,7 @@ do_install() {
 	install -m 0644 ${S}/../etc/*.properties ${D}${sysconfdir}
 	install -m 0644 ${S}/../etc/*.conf ${D}${sysconfdir}
 	install -m 0755 ${S}/../lib/rdk/zcip.script ${D}${sysconfdir}
-
+	install -m 0644 ${S}/../lib/rdk/imageFlasher.sh ${D}/lib/rdk/
 	install -d ${D}/var/spool/cron
 
 
@@ -85,7 +85,7 @@ do_install() {
         if [ -f ${S}/lib/rdk/tch_difd.sh ]; then 
             install -m 0755 ${S}/lib/rdk/tch_difd.sh ${D}${base_libdir}/rdk
         fi
-        install -m 0755 ${S}/lib/rdk/utils.sh ${D}${base_libdir}/rdk
+        install -m 0755 ${S}/../lib/rdk/utils.sh ${D}${base_libdir}/rdk
 
 	#
 	# The below scripts are installed by xre for emulator so need to

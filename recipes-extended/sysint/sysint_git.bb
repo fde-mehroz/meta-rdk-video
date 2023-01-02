@@ -110,6 +110,7 @@ do_install() {
 	install -m 0644 ${S}/../etc/*.json ${D}${sysconfdir}
 	install -m 0644 ${S}/../etc/*.properties ${D}${sysconfdir}
 	install -m 0644 ${S}/../etc/*.conf ${D}${sysconfdir}
+        install -m 0644 ${S}/../etc/env_setup.sh ${D}${sysconfdir}
 	install -m 0755 ${S}/../lib/rdk/zcip.script ${D}${sysconfdir}
 
 	install -d ${D}/var/spool/cron
@@ -448,10 +449,8 @@ do_install_append_rdkzram() {
 }
 
 do_install_append_rdktv() {
-        install -m 0755 ${S}/../rdktv/lib/rdk/imageFlasher.sh ${D}${base_libdir}/rdk/imageFlasher.sh
         install -m 0755 ${S}/../rdktv/lib/rdk/ssm_cri_data.sh ${D}${base_libdir}/rdk/ssm_cri_data.sh
         install -m 0755 ${S}/../rdktv/lib/rdk/vdec-statistics.sh ${D}${base_libdir}/rdk/vdec-statistics.sh
-        install -m 0755 ${S}/../rdktv/etc/env_setup.sh ${D}${sysconfdir}
         install -m 0644 ${S}/../rdktv/systemd_units/vdec-statistics.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../rdktv/systemd_units/disk-check.service ${D}${systemd_unitdir}/system
         install -m 0755 ${S}/../rdktv/lib/rdk/get-reboot-reason.sh ${D}${base_libdir}/rdk/get-reboot-reason.sh
