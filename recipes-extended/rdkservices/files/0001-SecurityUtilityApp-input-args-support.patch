@@ -1,0 +1,22 @@
+From 5899388d19c9b9c643277f5c5f2217e66d4d60d3 Mon Sep 17 00:00:00 2001
+From: Nikita Poltorapavlo <Nikita_Poltorapavlo2@cable.comcast.com>
+Date: Wed, 25 Jan 2023 16:45:34 +0000
+Subject: [PATCH] SecurityUtilityApp input args support
+
+---
+ Source/securityutility/app/SecurityUtilityApp.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/securityutility/app/SecurityUtilityApp.cpp b/Source/securityutility/app/SecurityUtilityApp.cpp
+index aa05827..30bf77f 100644
+--- a/Source/securityutility/app/SecurityUtilityApp.cpp
++++ b/Source/securityutility/app/SecurityUtilityApp.cpp
+@@ -55,7 +55,7 @@ int main(int argc, char** argv)
+ 
+     //string payload = "{\"url\":\"http://localhost\"}";
+ 
+-    string payload = "http://localhost";
++    string payload = argc > 1 ? argv[1] : "http://localhost";
+     
+     size_t len = payload.length();
+ 
