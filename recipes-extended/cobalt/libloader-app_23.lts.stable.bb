@@ -15,6 +15,7 @@ SRC_URI  = "git://cobalt.googlesource.com/cobalt.git;protocol=https;name=cobalt;
 SRC_URI += "${STARBOARD_SRC_URI};protocol=${CMF_GIT_PROTOCOL};destsuffix=starboard;name=starboard;branch=master"
 SRC_URI += "file://23/0001-Include-RDK-platforms.patch"
 SRC_URI += "file://23/0002-Fix-crashpad-build.patch"
+SRC_URI += "file://23/0003-breakpad-add-mapping-info.patch"
 
 PR = "3"
 SRCREV_cobalt = "23.lts.${PR}"

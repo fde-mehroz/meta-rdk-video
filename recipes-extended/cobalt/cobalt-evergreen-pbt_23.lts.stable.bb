@@ -60,28 +60,19 @@ do_install() {
     mkdir -p ${D}${datadir}${COBALT_APP_DIR}/content/ssl/
     ln -s /etc/ssl/certs ${D}${datadir}${COBALT_APP_DIR}/content/ssl/certs
 
-    install -d "${D}${datadir}${COBALT_APP_DIR}/lib/.debug/"
-    install -m 0755 ${WORKDIR}/debug_syms/tmp/cobalt-evergreen-snapshot/*/symbols/libcobalt.so ${D}${datadir}${COBALT_APP_DIR}/lib/.debug/
+    #intensionally installing unstripped libcobalt.so, So symbol generation step will make use of debug libcobalt.so
+    install -d "${D}${datadir}${COBALT_APP_DIR}/lib/"
+    install -m 0755 ${WORKDIR}/debug_syms/tmp/cobalt-evergreen-snapshot/*/symbols/libcobalt.so ${D}${datadir}${COBALT_APP_DIR}/lib/
 }
 
-PACKAGE_PREPROCESS_FUNCS += "dump_debug_symbols"
-dump_debug_symbols () {
-    machine_dir="${@d.getVar('MACHINE', True)}"
-    mkdir -p ${TMPDIR}/deploy/breakpad_symbols/$machine_dir
-
-    binary="${D}${datadir}${COBALT_APP_DIR}/lib/.debug/libcobalt.so"
-    bbnote "Dumping symbols from $binary"
-    dump_syms "${binary}" > "${TMPDIR}/deploy/breakpad_symbols/$machine_dir/$(basename "$binary").sym" || echo "dump_syms finished with errorlevel $?"
-}
 
 FILES_${PN}  = "${datadir}${COBALT_APP_DIR}/content/*"
 FILES_${PN} += "${datadir}${COBALT_APP_DIR}/manifest.json"
 FILES_${PN} += "${datadir}${COBALT_APP_DIR}/lib/libcobalt.so"
-FILES_${PN}-dbg += "${datadir}${COBALT_APP_DIR}/lib/.debug/libcobalt.so"
 FILES_SOLIBSDEV = ""
 
-INSANE_SKIP_${PN} += "dev-so libdir"
-INSANE_SKIP_${PN}-dbg += "dev-so libdir"
+INSANE_SKIP_${PN} += "dev-so "
+INSANE_SKIP_${PN}-dbg += "dev-so "
 
 PROVIDES = "virtual/cobalt-evergreen"
 RPROVIDES_${PN} = "virtual/cobalt-evergreen"
