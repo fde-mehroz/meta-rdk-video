@@ -82,6 +82,8 @@ EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell', ' -DPLUGIN
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell_disable_autostart', ' -DPLUGIN_RDKSHELL_AUTOSTART=false ', ' -DPLUGIN_RDKSHELL_AUTOSTART=true ', d)}"
 EXTRA_OECMAKE += "${@bb.utils.contains_any('DISTRO_FEATURES', 'rdkshell_ra second_form_factor', ' -DPLUGIN_RDKSHELL_AUTOSTART=true ', ' ', d)}"
 
+EXTRA_OECMAKE += "-DDISABLE_GEOGRAPHY_TIMEZONE=ON"
+
 PACKAGECONFIG[activitymonitor]      = "-DPLUGIN_ACTIVITYMONITOR=ON,-DPLUGIN_ACTIVITYMONITOR=OFF,"
 PACKAGECONFIG[avinput]              = "-DPLUGIN_AVINPUT=ON,-DPLUGIN_AVINPUT=OFF,"
 PACKAGECONFIG[bluetoothcontrol]     = "-DPLUGIN_BLUETOOTH=ON -DPLUGIN_BLUETOOTH_AUTOSTART=true,-DPLUGIN_BLUETOOTH=OFF,,bluez5"
