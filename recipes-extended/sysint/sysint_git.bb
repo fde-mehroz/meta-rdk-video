@@ -181,6 +181,7 @@ do_install() {
         install -m 0644 ${S}/../systemd_units/gstreamer-cleanup.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/oops-dump.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/path-fail-notifier@.service ${D}${systemd_unitdir}/system
+        install -m 0644 ${S}/../systemd_units/build-time-setter.service ${D}${systemd_unitdir}/system
         if [ "${RF4CE_CTRLM_ENABLED}" = "false" ]; then
            sed -i "/^After=/ s/$/ rf4cemgr.service/" ${D}${systemd_unitdir}/system/update-rf4ce-details.service
         else
@@ -460,6 +461,7 @@ SYSTEMD_SERVICE_${PN} = "hosts.service"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'enable_maintenance_manager', '', 'dcm-log.service',d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'enable_maintenance_manager', '', 'rfc-config.service',d)}"
 SYSTEMD_SERVICE_${PN} += "log-rdk-start.service"
+SYSTEMD_SERVICE_${PN} += "build-time-setter.service"
 SYSTEMD_SERVICE_${PN} += "previous-log-backup.service"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'enable_maintenance_manager', '', 'swupdate.service',d)}"
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'syslog-ng', '', 'dump-log.timer',d)}"
