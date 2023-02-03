@@ -21,6 +21,9 @@ SRC_URI += "file://0003-OCDM-increase-RPC-comm-timeout.patch \
            file://0001-RDKTV-15393-clock_gettime.patch \
            file://0005-DELIA-58939-Webprocess-crash.patch \
            file://0001-Thunder_json_quoted_string_parsing_fix.patch \
+           file://0001-SERVICES-Starting-multiples-services-concurrently-mi.patch \
+           file://0001-DEADLOCK-Deadlock-prevention-by-locking-the-ServiceA.patch \
+           file://0001-DEADLOCK-Next-to-closing-the-deadlock-on-the-open-of.patch \
            "
 
 inherit systemd update-rc.d pythonnative
