@@ -80,8 +80,8 @@ LOGGER:="${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_voice_sdk', 'rdkx-logger
 inherit ${LOGGER}
 
 do_install_append() {
-   install -d ${D}${datadir}
    if [ "${AUDIO_PLAYBACK}" = "true" ]; then
+      install -d ${D}${datadir}
       install -m 0644 ${S}/../tone_1khz.wav ${D}${datadir}
    fi
 }
