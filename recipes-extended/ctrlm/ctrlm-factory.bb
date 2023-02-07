@@ -70,8 +70,9 @@ EXTRA_OECONF_append   = "${@bb.utils.contains('AUDIO_PLAYBACK', 'true', ' --enab
 MICROPHONE     ?= "false"
 EXTRA_OECONF_append   = "${@bb.utils.contains('MICROPHONE', 'true', ' --enable-microphone', '', d)}"
 
-CUSTOM_AUDIO_ANALYSIS ?= "false"
-EXTRA_OECONF_append   = "${@bb.utils.contains('CUSTOM_AUDIO_ANALYSIS', 'true', ' --enable-custom-audio-analysis', '', d)}"
+CUSTOM_AUDIO_ANALYSIS_LIB ?= ""
+EXTRA_OECONF_append   = "${@ ' --enable-custom-audio-analysis' if (d.getVar('CUSTOM_AUDIO_ANALYSIS_LIB', expand=False) != "") else ''}"
+LDFLAGS_append        = "${@ ' -l${CUSTOM_AUDIO_ANALYSIS_LIB}' if (d.getVar('CUSTOM_AUDIO_ANALYSIS_LIB', expand=False) != "") else ''}"
 
 EXTRA_OECONF_append   = "${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_mic_tap', ' --enable-mic-tap', '', d)}"
 
