@@ -13,6 +13,7 @@ S = "${WORKDIR}/git"
 
 FILES_${PN} += "${includedir}/ctrlm_fta_lib.h \
                 ${includedir}/ctrlm_fta_caa.h \
+                ${includedir}/ctrlm_fta_platform.h \
                "
 
 do_configure[noexec] = "1"
@@ -22,6 +23,7 @@ do_install() {
     install -d ${D}${includedir}
     install -m 644 ${S}/src/ctrlm_fta_lib.h ${D}${includedir}
     install -m 644 ${S}/src/ctrlm_fta_caa.h ${D}${includedir}
+    install -m 644 ${S}/src/ctrlm_fta_platform.h ${D}${includedir}
 }
 
 ALLOW_EMPTY_${PN} = "1"

@@ -74,6 +74,11 @@ CUSTOM_AUDIO_ANALYSIS_LIB ?= ""
 EXTRA_OECONF_append   = "${@ ' --enable-custom-audio-analysis' if (d.getVar('CUSTOM_AUDIO_ANALYSIS_LIB', expand=False) != "") else ''}"
 LDFLAGS_append        = "${@ ' -l${CUSTOM_AUDIO_ANALYSIS_LIB}' if (d.getVar('CUSTOM_AUDIO_ANALYSIS_LIB', expand=False) != "") else ''}"
 
+CUSTOM_AUTH_LIB ?= ""
+CFLAGS_append         = "${@ ' -DCTRLMF_WSS_ENABLED' if (d.getVar('CUSTOM_AUTH_LIB', expand=False) != "") else ''}"
+CXXFLAGS_append       = "${@ ' -DCTRLMF_WSS_ENABLED' if (d.getVar('CUSTOM_AUTH_LIB', expand=False) != "") else ''}"
+LDFLAGS_append        = "${@ ' -l${CUSTOM_AUTH_LIB}' if (d.getVar('CUSTOM_AUTH_LIB', expand=False) != "") else ''}"
+
 EXTRA_OECONF_append   = "${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_mic_tap', ' --enable-mic-tap', '', d)}"
 
 XLOG_MODULE_NAME="CTRLM"
