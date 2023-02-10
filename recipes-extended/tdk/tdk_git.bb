@@ -146,6 +146,10 @@ do_install_append () {
     install -m 755 ${S}/SystemUtil_stub/scripts/Rdk_browser2.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/Ledmgr_testrunner.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/IARMBUS_stub/scripts/RunAppInBackground.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/system_device_details_check.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/system_services_status_check.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/tdkappsversioncheck.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/rdk6_version.config ${D}${TDK_TARGETDIR}/
     if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_firebolt_compliance_tdk', 'true', 'false', d)}; then
         install -m 755 ${S}/FireboltCompliance_Validation/scripts/RunGraphicsTDKTest.sh ${D}${TDK_TARGETDIR}/
         install -m 755 ${S}/FireboltCompliance_Validation/scripts/ExecuteSuite.sh ${D}${TDK_TARGETDIR}/opensourcecomptest/
