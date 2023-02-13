@@ -13,7 +13,9 @@ PV = "1.x+git${SRCPV}"
 S = "${WORKDIR}/git"
 
 #Sep 08 2022
-SRC_URI = "git://github.com/rdkcentral/RDKShell;branch=master"
+SRC_URI = "git://github.com/rdkcentral/RDKShell;branch=master \
+           file://0001-crash-in-RdkShell-systemRam.patch \
+          "
 SRCREV = "859ab4266e290cf00dab5a744ffe48452ca3e7e1"
 
 do_install() {

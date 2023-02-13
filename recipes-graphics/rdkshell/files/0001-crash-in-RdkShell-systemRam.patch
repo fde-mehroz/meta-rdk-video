@@ -1,0 +1,31 @@
+From 2fca85456504c9c4d7e7840b1bbecc642a1db4c5 Mon Sep 17 00:00:00 2001
+From: evelum102 <Ezhilarasi_Velumani@comcast.com>
+Date: Wed, 18 Jan 2023 14:33:15 +0000
+Subject: [PATCH] crash in RdkShell systemRam
+
+---
+ rdkshell.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rdkshell.cpp b/rdkshell.cpp
+index d4cba30..5773af8 100644
+--- a/rdkshell.cpp
++++ b/rdkshell.cpp
+@@ -293,7 +293,6 @@ namespace RdkShell
+                 gMemoryMonitorMutex.unlock();
+            }
+         });
+-        gMemoryMonitorThread.detach();
+     }
+
+     void initialize()
+@@ -482,6 +481,7 @@ namespace RdkShell
+         gMemoryMonitorMutex.lock();
+         gRunMemoryMonitor = false;
+         gMemoryMonitorMutex.unlock();
++       gMemoryMonitorThread.join();
+     }
+
+     void run()
+--
+2.17.1
