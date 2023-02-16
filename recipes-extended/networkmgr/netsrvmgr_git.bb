@@ -12,6 +12,8 @@ SRCREV_netsrvmgr = "${AUTOREV}"
 S = "${WORKDIR}/git"
 
 CXXFLAGS +=" -DYOCTO_BUILD"
+#filesystem library available from C++17 only
+CXXFLAGS_append_dunfell += " -std=c++17"
 DEPENDS += "safec-common-wrapper"
 DEPENDS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', ' safec', " ", d)}"
 
