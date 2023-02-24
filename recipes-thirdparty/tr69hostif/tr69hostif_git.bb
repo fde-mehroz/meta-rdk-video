@@ -17,7 +17,8 @@ DEPENDS = "iarmbus iarmmgrs e2fsprogs libsoup-2.4 libsyswrapper yajl \
            storagemanager cjson libtinyxml2\
 	  "
 DEPENDS_append = " rdk-logger libparodus parodus"
-DEPENDS_append_client = " tr69agent-headers netsrvmgr"
+DEPENDS_append_client = " netsrvmgr"
+DEPENDS_append_client = "${@bb.utils.contains('DISTRO_FEATURES', 'tr69agent',' tr69agent-headers','', d)}"
 
 DEPENDS += "safec-common-wrapper"
 DEPENDS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', ' safec', " ", d)}"
@@ -95,6 +96,7 @@ INCLUDE_DIRS += "\
 
 CPPFLAGS += "${INCLUDE_DIRS}"
 CPPFLAGS_append_client = " -DMEDIA_CLIENT "
+CPPFLAGS_append_client = " ${@bb.utils.contains('DISTRO_FEATURES', 'tr69agent',' -DTR69AGENT_SUPPORT ','', d)}"
 # C++11 is required
 CXXFLAGS += "-std=c++11"
 CXXFLAGS += " -DYAJL_V2"
