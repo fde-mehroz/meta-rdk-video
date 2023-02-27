@@ -65,6 +65,11 @@ FILES_${PN} += "${libdir}/*.so"
 TARGET_CC_ARCH += "${LDFLAGS}"
 do_configure_prepend() {
 	rm -rf ${S}/Makefile
+	# If this file is not needed, remove from repo. Deleting from source directory causes rebuild when module
+  	# builds from externalsrc. For now removing from git ls-files
+	cd ${S}
+	git update-index --assume-unchanged ${S}/Makefile
+	cd -
 }
 
 do_compile() {

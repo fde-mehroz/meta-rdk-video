@@ -17,6 +17,11 @@ inherit coverity pkgconfig
 
 do_configure_prepend() {
   rm -f ${S}/Makefile
+  # If this file is not needed, remove from repo. Deleting from source directory causes rebuild when module
+  # builds from externalsrc. For now removing from git ls-files
+  cd ${S}
+  git update-index --assume-unchanged ${S}/Makefile
+  cd -
 }
 do_install_append_client() {
 	install -d 0755 ${D}/var/www

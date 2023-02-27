@@ -24,3 +24,10 @@ INCLUDE_DIRS = " \
 
 FILES_${PN} += "${libdir}/wpeframework/plugins/*.so*"
 FILES_${PN}-dbg += "${libdir}/wpeframework/plugins/.debug/*.so"
+
+do_configure_append() {
+        # Configure leaves below files changed, thus causing sha change for subsequent builds, causing rebuilds
+	cd ${S}
+	git update-index --assume-unchanged ${S}/TVMgr.json
+	cd -
+}
