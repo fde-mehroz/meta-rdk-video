@@ -3,7 +3,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SECTION = "base"
-DEPENDS = "sqlite3 curl rdkversion jansson glib-2.0 systemd iarmbus iarmmgrs breakpad util-linux devicesettings nopoll rfc libarchive safec-common-wrapper gperf-native"
+DEPENDS = "sqlite3 curl rdkversion jansson glib-2.0 systemd iarmbus iarmmgrs breakpad util-linux devicesettings nopoll rfc libarchive safec-common-wrapper gperf-native xr-mq"
 
 DEPENDS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_voice_sdk', ' xr-voice-sdk xr-timestamp', '', d)}"
 DEPENDS_append = "${@bb.utils.contains('DISTRO_FEATURES_RDK', 'comcast-gperftools-heapcheck-wp', ' xr-fdc', '', d)}"
@@ -88,7 +88,7 @@ CXXFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', '', ' -DSAF
 #CXXFLAGS_append = " -DMEM_DEBUG"
 #CXXFLAGS_append = " -DANSI_CODES_DISABLED"
 
-LDFLAGS=" -lrt -lpthread -lstdc++ -lsqlite3 -lcurl -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lz -lpthread -ljansson -ldbus-1 -luuid -lIARMBus -lds -lnopoll -lssl -lcrypto -lsystemd -ldshalcli -lrfcapi -lrdkversion"
+LDFLAGS=" -lrt -lpthread -lstdc++ -lsqlite3 -lcurl -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lz -lpthread -ljansson -ldbus-1 -luuid -lIARMBus -lds -lnopoll -lssl -lcrypto -lsystemd -ldshalcli -lrfcapi -lrdkversion -lxr_mq"
 
 # Default to STB Platform
 PLATFORM ?= "STB"
@@ -128,6 +128,18 @@ TELEMETRY_SUPPORT  ?= "false"
 DEPENDS_append      = "${@bb.utils.contains('TELEMETRY_SUPPORT', 'true', ' telemetry', '', d)}"
 LDFLAGS_append      = "${@bb.utils.contains('TELEMETRY_SUPPORT', 'true', ' -ltelemetry_msgsender', '', d)}"
 EXTRA_OECONF_append = "${@bb.utils.contains('TELEMETRY_SUPPORT', 'true', ' --enable-telemetry-support', '', d)}"
+
+# BLE support
+RDEPENDS_${PN}_append = "${@bb.utils.contains('MACHINE_FEATURES', 'ble-rcu', ' asbluetoothrcu', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('MACHINE_FEATURES', 'ble-rcu', ' --enable-ble', '', d)}"
+#100 byte ADPCM coming from BLE remote needs to be decoded to PCM before sending to endpoint
+CXXFLAGS_append = "${@bb.utils.contains('MACHINE_FEATURES', 'ble-rcu', ' -DAUDIO_DECODE', '', d)}"
+# libevdev is needed for BLE enabled platforms or if the IR input device needs to be found by the name instead of the path
+IR_INPUT_DEVICE_BY_NAME ??= "false"
+LIBEVDEV_DEPENDENCY = "${@bb.utils.contains('MACHINE_FEATURES', 'ble-rcu' ,'true', bb.utils.contains('IR_INPUT_DEVICE_BY_NAME', 'true' ,'true', 'false', d), d)}"
+DEPENDS_append = "${@bb.utils.contains('LIBEVDEV_DEPENDENCY', 'true', ' libevdev', '', d)}"
+LDFLAGS_append = "${@bb.utils.contains('LIBEVDEV_DEPENDENCY', 'true', ' -levdev', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('LIBEVDEV_DEPENDENCY', 'true', ' --enable-ir-input-device-by-name', '', d)}"
 
 CTRLM_GENERIC = "${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_generic', 'true', 'false', d)}"
 
