@@ -3,7 +3,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SECTION = "base"
-DEPENDS = "sqlite3 curl rdkversion jansson glib-2.0 systemd iarmbus iarmmgrs breakpad util-linux devicesettings nopoll rfc libarchive safec-common-wrapper gperf-native xr-mq"
+DEPENDS = "sqlite3 curl rdkversion jansson glib-2.0 systemd iarmbus iarmmgrs breakpad util-linux devicesettings nopoll rfc libarchive safec-common-wrapper gperf-native xr-mq libsyswrapper"
 
 DEPENDS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_voice_sdk', ' xr-voice-sdk xr-timestamp', '', d)}"
 DEPENDS_append = "${@bb.utils.contains('DISTRO_FEATURES_RDK', 'comcast-gperftools-heapcheck-wp', ' xr-fdc', '', d)}"
@@ -67,7 +67,6 @@ INCLUDE_DIRS = " \
     -I=${includedir}/rdk/ds \
     -I=${includedir}/rdk/ds-rpc \
     -I=${includedir}/rdk/ds-hal \
-    -I=${includedir}/nopoll \
     "
 
 CFLAGS_append = " -std=c11 -fPIC -D_REENTRANT -rdynamic -Wall -Werror ${INCLUDE_DIRS}"
@@ -88,20 +87,20 @@ CXXFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', '', ' -DSAF
 #CXXFLAGS_append = " -DMEM_DEBUG"
 #CXXFLAGS_append = " -DANSI_CODES_DISABLED"
 
-LDFLAGS=" -lrt -lpthread -lstdc++ -lsqlite3 -lcurl -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lz -lpthread -ljansson -ldbus-1 -luuid -lIARMBus -lds -lnopoll -lssl -lcrypto -lsystemd -ldshalcli -lrfcapi -lrdkversion -lxr_mq"
+LDFLAGS=" -lrt -lpthread -lstdc++ -lsqlite3 -lcurl -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lz -lpthread -ljansson -ldbus-1 -luuid -lIARMBus -lds -lnopoll -lssl -lcrypto -lsystemd -ldshalcli -lrfcapi -lrdkversion -lxr_mq -lsecure_wrapper"
 
 # Default to STB Platform
-PLATFORM ?= "STB"
+PLATFORM ??= "STB"
 EXTRA_OECONF_append = "${@bb.utils.contains('PLATFORM', 'STB', ' --enable-platform=stb', '', d)}"
 EXTRA_OECONF_append = "${@bb.utils.contains('PLATFORM', 'TV', ' --enable-platform=tv', '', d)}"
 
 # Default to HDMI / CEC discovery for IRDB
 # Options: NONE / HDMI / CEC / ALL
 IRDB_DISCOVERY_DEFAULT = "ALL"
-IRDB_DISCOVERY ?= "${IRDB_DISCOVERY_DEFAULT}"
-CXXFLAGS_append = " ${@bb.utils.contains('IRDB_DISCOVERY', 'ALL', ' -DIRDB_HDMI_DISCOVERY -DIRDB_CEC_DISCOVERY', '', d)}"
-CXXFLAGS_append = " ${@bb.utils.contains('IRDB_DISCOVERY', 'HDMI', ' -DIRDB_HDMI_DISCOVERY', '', d)}"
-CXXFLAGS_append = " ${@bb.utils.contains('IRDB_DISCOVERY', 'CEC', ' -DIRDB_CEC_DISCOVERY', '', d)}"
+IRDB_DISCOVERY ??= "${IRDB_DISCOVERY_DEFAULT}"
+CXXFLAGS_append  = " ${@bb.utils.contains('IRDB_DISCOVERY', 'ALL', ' -DIRDB_HDMI_DISCOVERY -DIRDB_CEC_DISCOVERY', '', d)}"
+CXXFLAGS_append  = " ${@bb.utils.contains('IRDB_DISCOVERY', 'HDMI', ' -DIRDB_HDMI_DISCOVERY', '', d)}"
+CXXFLAGS_append  = " ${@bb.utils.contains('IRDB_DISCOVERY', 'CEC', ' -DIRDB_CEC_DISCOVERY', '', d)}"
 
 # Thunder Dependency
 THUNDER            ?= "false"
@@ -110,11 +109,11 @@ LDFLAGS_append      = "${@bb.utils.contains('THUNDER', 'true', ' -lWPEFrameworkC
 DEPENDS_append      = "${@bb.utils.contains('THUNDER', 'true', ' wpeframework', '', d)}"
 EXTRA_OECONF_append = "${@bb.utils.contains('THUNDER', 'true', ' --enable-thunder', '', d)}"
 
-THUNDER_SECURITY   ?= "true"
+THUNDER_SECURITY  ??= "true"
 EXTRA_OECONF_append = "${@bb.utils.contains('THUNDER_SECURITY', 'true', ' --enable-thunder-security', '', d)}"
 
 # Memory Lock Implementation
-MEMORY_LOCK        ?= "false"
+MEMORY_LOCK       ??= "false"
 CXXFLAGS_append     = "${@bb.utils.contains('MEMORY_LOCK', 'true', ' -DMEMORY_LOCK', '', d)}"
 LDFLAGS_append      = "${@bb.utils.contains('MEMORY_LOCK', 'true', ' -lclnl', '', d)}"
 DEPENDS_append      = "${@bb.utils.contains('MEMORY_LOCK', 'true', ' clnl', '', d)}"
@@ -124,7 +123,7 @@ LDFLAGS_append ="${@bb.utils.contains('DISTRO_FEATURES_RDK', 'comcast-gperftools
 LDFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', ' `pkg-config --libs libsafec`', '', d)}"
 
 # Telemetry Support
-TELEMETRY_SUPPORT  ?= "false"
+TELEMETRY_SUPPORT  ??= "false"
 DEPENDS_append      = "${@bb.utils.contains('TELEMETRY_SUPPORT', 'true', ' telemetry', '', d)}"
 LDFLAGS_append      = "${@bb.utils.contains('TELEMETRY_SUPPORT', 'true', ' -ltelemetry_msgsender', '', d)}"
 EXTRA_OECONF_append = "${@bb.utils.contains('TELEMETRY_SUPPORT', 'true', ' --enable-telemetry-support', '', d)}"
@@ -143,6 +142,47 @@ EXTRA_OECONF_append = "${@bb.utils.contains('LIBEVDEV_DEPENDENCY', 'true', ' --e
 
 CTRLM_GENERIC = "${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_generic', 'true', 'false', d)}"
 
+# Advanced Secure Binding Support
+ASB ??= "false"
+EXTRA_OECONF_append = "${@bb.utils.contains('ASB', 'true', ' --enable-asb', '', d)}"
+
+# Authorization Support
+AUTH             ??= "false"
+AUTH_THUNDER     ??= "false"
+AUTH_RECEIVER_ID ??= "false"
+AUTH_DEVICE_ID   ??= "false"
+AUTH_ACCOUNT_ID  ??= "false"
+AUTH_PARTNER_ID  ??= "false"
+AUTH_EXPERIENCE  ??= "false"
+AUTH_SAT_TOKEN   ??= "false"
+EXTRA_OECONF_append = "${@bb.utils.contains('AUTH',             'true', ' --enable-auth', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('AUTH_RECEIVER_ID', 'true', ' --enable-auth-receiver-id', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('AUTH_DEVICE_ID',   'true', ' --enable-auth-device-id', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('AUTH_ACCOUNT_ID',  'true', ' --enable-auth-account-id', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('AUTH_PARTNER_ID',  'true', ' --enable-auth-partner-id', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('AUTH_EXPERIENCE',  'true', ' --enable-auth-experience', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('AUTH_SAT_TOKEN',   'true', ' --enable-auth-sat-token', '', d)}"
+
+IRDB ??= "false"
+EXTRA_OECONF_append = "${@bb.utils.contains('IRDB', 'true', ' --enable-irdb', '', d)}"
+
+RF4CE_PACKET_ANALYSIS ??= "false"
+EXTRA_OECONF_append = "${@bb.utils.contains('RF4CE_PACKET_ANALYSIS', 'true', ' --enable-rf4ce-packet-analysis', '', d)}"
+
+VOICE_NEXTGEN_MAC ??= "false"
+EXTRA_OECONF_append = "${@bb.utils.contains('VOICE_NEXTGEN_MAC', 'true', ' --enable-voice-nextgen-mac', '', d)}"
+
+VOICE_KEYWORD_BEEP ??= "false"
+EXTRA_OECONF_append = "${@bb.utils.contains('VOICE_KEYWORD_BEEP', 'true', ' --enable-voice-keyword-beep', '', d)}"
+
+# Enable Thunder IF using UEI irdb or Voice Keyword Beep or Auth via Thunder
+python() {
+    if 'ctrlm_irdb_uei' in d.getVar('DISTRO_FEATURES', False) or d.getVar('VOICE_KEYWORD_BEEP', False) == 'true' or d.getVar('AUTH_THUNDER', False) == 'true':
+        d.setVar('THUNDER', 'true')
+    else:
+        d.setVar('THUNDER', 'false')
+}
+
 XLOG_MODULE_NAME="CTRLM"
 LOGGER:="${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_voice_sdk', 'rdkx-logger', '', d)}"
 inherit ${LOGGER}
@@ -159,12 +199,13 @@ export CTRLM_UTILS_JSON_COMBINE    = "${@bb.utils.contains('DISTRO_FEATURES', 'c
 export STAGING_BINDIR_NATIVE
 
 CTRLM_CONFIG_VSDK    = "${PKG_CONFIG_SYSROOT_DIR}/usr/include/xrsr_config.json"
+CTRLM_CONFIG_CPC     = "${PKG_CONFIG_SYSROOT_DIR}/usr/include/ctrlm_cpc_config.json"
 CTRLM_CONFIG_OEM_ADD = "${S}/../ctrlm_config_oem.add.json"
 CTRLM_CONFIG_OEM_SUB = "${S}/../ctrlm_config_oem.sub.json"
 CTRLM_CONFIG_CPC_ADD = "${S}/../ctrlm_config_cpc.add.json"
 CTRLM_CONFIG_CPC_SUB = "${S}/../ctrlm_config_cpc.sub.json"
 
-EXTRA_OECONF_append = " CTRLM_CONFIG_JSON_VSDK=${CTRLM_CONFIG_VSDK} CTRLM_CONFIG_JSON_OEM_SUB=${CTRLM_CONFIG_OEM_SUB} CTRLM_CONFIG_JSON_OEM_ADD=${CTRLM_CONFIG_OEM_ADD} CTRLM_CONFIG_JSON_CPC_SUB=${CTRLM_CONFIG_CPC_SUB} CTRLM_CONFIG_JSON_CPC_ADD=${CTRLM_CONFIG_CPC_ADD}"
+EXTRA_OECONF_append = " CTRLM_CONFIG_JSON_VSDK=${CTRLM_CONFIG_VSDK} CTRLM_CONFIG_JSON_CPC=${CTRLM_CONFIG_CPC} CTRLM_CONFIG_JSON_OEM_SUB=${CTRLM_CONFIG_OEM_SUB} CTRLM_CONFIG_JSON_OEM_ADD=${CTRLM_CONFIG_OEM_ADD} CTRLM_CONFIG_JSON_CPC_SUB=${CTRLM_CONFIG_CPC_SUB} CTRLM_CONFIG_JSON_CPC_ADD=${CTRLM_CONFIG_CPC_ADD}"
 EXTRA_OECONF_append = "${@ ' --enable-xrsr_sdt' if (d.getVar('SUPPORT_VOICE_DEST_ALSA', expand=False) == "true") else ''}"
 
 DEPENDS_append   = "${@ ' virtual-mic' if (d.getVar('SUPPORT_VOICE_DEST_ALSA',   expand=False) == "true") else ''}"
