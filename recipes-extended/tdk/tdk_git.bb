@@ -145,6 +145,8 @@ do_install_append () {
     install -m 755 ${S}/SystemUtil_stub/scripts/Optimusprime_testrunner.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/Rdk_browser2.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/Ledmgr_testrunner.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/tdk_apparmor_tests.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/apparmor_profile.config ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/IARMBUS_stub/scripts/RunAppInBackground.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_device_details_check.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_services_status_check.sh ${D}${TDK_TARGETDIR}/
