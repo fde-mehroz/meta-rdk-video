@@ -1,3 +1,6 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'enable_gst_testing', 'file://0015-good-plugin-inputfiles-path.patch', '', d)} \
+"
 
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'enable_gst_testing', ' bzip2 wavpack libvpx ', '', d)}"
 PACKAGECONFIG_append = "${@bb.utils.contains('DISTRO_FEATURES', 'enable_gst_testing', ' wavpack vpx ', '', d)}"
