@@ -180,7 +180,7 @@ do_install_append() {
     install -m 0744 ${RECIPEDIR}/ctrlm_sig_quit.sh ${D}/usr/local/bin
 }
 
-addtask clean_oem_config before do_configure
+addtask clean_oem_config after do_unpack before do_configure
 
 do_clean_oem_config() {
     rm -f ${CTRLM_CONFIG_CPC_ADD} ${CTRLM_CONFIG_CPC_SUB} ${CTRLM_CONFIG_OEM_ADD} ${CTRLM_CONFIG_OEM_SUB}

@@ -30,7 +30,7 @@ EXTRA_OECONF_append = " CTRLM_XRAUDIO_HAL_CONFIG_JSON_ADD=${XRAUDIO_HAL_CONFIG_O
 
 EXTRA_OECONF_append = " GIT_BRANCH=${CMF_GIT_BRANCH}"
 
-addtask clean_oem_config before do_configure
+addtask clean_oem_config after do_unpack before do_configure
 
 do_clean_oem_config() { 
     rm -f ${XRAUDIO_HAL_CONFIG_OEM_ADD} ${XRAUDIO_HAL_CONFIG_OEM_SUB}
