@@ -3,7 +3,7 @@ HOMEPAGE = "https://cobalt.googlesource.com/"
 
 LICENSE = "BSD-3-Clause & Apache-2.0"
 LIC_FILES_CHKSUM = " \
-    file://src/LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d \
+    file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d \
 "
 
 TOOLCHAINS_DIR = "starboard-toolchains"
@@ -13,8 +13,8 @@ CLANG_BUILD_SUBDIR = "${TOOLCHAINS_DIR}/x86_64-linux-gnu-clang-chromium-${CLANG_
 SRC_URI  = "git://cobalt.googlesource.com/cobalt.git;protocol=https;name=cobalt;branch=23.lts.stable"
 SRC_URI += "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-${CLANG_BUILD_REVISION}.tgz;subdir=${CLANG_BUILD_SUBDIR};name=clang"
 
-PV = "3.2.1"
-SRCREV_cobalt = "23.lts.2"
+PV = "3.3.9"
+SRCREV_cobalt = "23.lts.3"
 do_fetch[vardeps] += " SRCREV_FORMAT SRCREV_cobalt"
 
 SRC_URI[clang.sha256sum] = "3adf7a2338e86c202527f6bfaa945697eb2189b8965f7598d9d1159a195dbd51"
@@ -28,7 +28,7 @@ inherit python3native pkgconfig breakpad-wrapper
 
 BREAKPAD_BIN = "lib*.so*"
 
-SB_VERSION = "13"
+SB_VERSION = "14"
 COBALT_ARCH_arm = "arm-${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'hardfp', 'softfp', d)}"
 COBALT_ARCH_aarch64 = "arm64"
 COBALT_PLATFORM ?= "evergreen-${COBALT_ARCH}"

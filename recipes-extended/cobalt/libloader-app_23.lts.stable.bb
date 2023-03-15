@@ -16,7 +16,7 @@ SRC_URI += "${STARBOARD_SRC_URI};protocol=${CMF_GIT_PROTOCOL};destsuffix=starboa
 SRC_URI += "file://23/0001-Include-RDK-platforms.patch"
 SRC_URI += "file://23/0002-Fix-crashpad-build.patch"
 
-PR = "2"
+PR = "3"
 SRCREV_cobalt = "23.lts.${PR}"
 SRCREV_starboard = "${STARBOARD_SRCREV}"
 
@@ -41,16 +41,18 @@ COBALT_BUILD_TYPE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'cobalt-qa', 'qa',
 PACKAGECONFIG ?= "cryptography ${COBALT_BUILD_TYPE}"
 PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'opencdm', 'opencdm', '', d)}"
 PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'thunder_security_disable', '', 'securityagent', d)}"
+PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'cobalt-evergreen-full', '', 'lite', d)}"
 
 PACKAGECONFIG[opencdm]       = "rdk_enable_ocdm=true,rdk_enable_ocdm=false,,"
 PACKAGECONFIG[securityagent] = "rdk_enable_securityagent=true,rdk_enable_securityagent=false,,"
 PACKAGECONFIG[cryptography]  = "rdk_enable_cryptography=true,rdk_enable_cryptography=false,,"
+PACKAGECONFIG[lite]          = "sb_evergreen_compatible_enable_lite=true,sb_evergreen_compatible_enable_lite=false,,"
 PACKAGECONFIG[qa]            = ",,nodejs-native,"
 PACKAGECONFIG[gold]          = ""
 PACKAGECONFIG[nplb]          = ""
 
 GN_ARGS_EXTRA ?= ""
-GN_ARGS_EXTRA_append = " sb_is_evergreen_compatible=true sb_evergreen_compatible_enable_lite=true"
+GN_ARGS_EXTRA_append = " sb_is_evergreen_compatible=true"
 GN_ARGS_EXTRA_append = " rdk_arm_call_convention=\"${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'hardfp', 'softfp', d)}\""
 GN_ARGS_EXTRA_append = " ${PACKAGECONFIG_CONFARGS}"
 
@@ -65,14 +67,6 @@ do_unpack_extra() {
     cp -ar "${WORKDIR}/starboard/src/third_party/starboard" "${S}/third_party/"
 }
 addtask unpack_extra after do_patch before do_configure
-
-# Cobalt GN requires '/usr/bin/env python' to work
-do_configure[prefuncs] += "setup_python_link"
-setup_python_link() {
-    if [ ! -e ${STAGING_BINDIR_NATIVE}/python3-native/python ]; then
-      (cd ${STAGING_BINDIR_NATIVE}/python3-native && ln -s python3 python)
-    fi
-}
 
 do_configure() {
     ${PYTHON} cobalt/build/gn.py -c ${COBALT_BUILD_TYPE} -p ${COBALT_PLATFORM} --overwrite_args

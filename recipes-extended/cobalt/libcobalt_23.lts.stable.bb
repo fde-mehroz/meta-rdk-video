@@ -18,7 +18,7 @@ SRC_URI  = "git://cobalt.googlesource.com/cobalt.git;protocol=https;name=cobalt;
 SRC_URI += "${STARBOARD_SRC_URI};protocol=${CMF_GIT_PROTOCOL};destsuffix=starboard;name=starboard;branch=master"
 SRC_URI += "file://23/0001-Include-RDK-platforms.patch"
 
-PR = "2"
+PR = "3"
 SRCREV_cobalt = "23.lts.${PR}"
 SRCREV_starboard = "${STARBOARD_SRCREV}"
 
@@ -66,14 +66,6 @@ do_unpack_extra() {
     cp -ar "${WORKDIR}/starboard/src/third_party/starboard" "${S}/third_party/"
 }
 addtask unpack_extra after do_patch before do_configure
-
-# Cobalt GN requires '/usr/bin/env python' to work
-do_configure[prefuncs] += "setup_python_link"
-setup_python_link() {
-    if [ ! -e ${STAGING_BINDIR_NATIVE}/python3-native/python ]; then
-      (cd ${STAGING_BINDIR_NATIVE}/python3-native && ln -s python3 python)
-    fi
-}
 
 do_configure() {
     ${PYTHON} cobalt/build/gn.py -c ${COBALT_BUILD_TYPE} -p ${COBALT_PLATFORM} --overwrite_args
