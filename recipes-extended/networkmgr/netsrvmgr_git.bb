@@ -23,6 +23,9 @@ SYSLOG-NG_SERVICE_netsrvmgr = "netsrvmgr.service"
 SYSLOG-NG_DESTINATION_netsrvmgr = "netsrvmgr.log"
 SYSLOG-NG_LOGRATE_netsrvmgr = "high"
 
+#define connectivity endpoints
+CONNECTIVITY_ENDPOINT_1= "http://clients3.google.com/generate_204"
+
 CXXFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', ' `pkg-config --cflags libsafec`', ' -fPIC', d)}"
 CXXFLAGS_append_client = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', ' `pkg-config --cflags libsafec`', ' -fPIC', d)}"
 
@@ -47,6 +50,8 @@ PACKAGECONFIG += " ${@bb.utils.contains('MACHINE_EXTRA_RDEPENDS', 'virtual/mocad
 PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wifi', '', d)}"
 PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'lostfound', '', d)}"
 PACKAGECONFIG += "telemetry_2_0"
+PACKAGECONFIG += "internet-test-app"
+PACKAGECONFIG[internet-test-app] = "--enable-internet-test-app=yes,--enable-internet-test-app=no,,"
 PACKAGECONFIG[moca] = "--enable-rdk-moca-hal=yes,--enable-rdk-moca-hal=no,,"
 PACKAGECONFIG[wifi] = "--enable-rdk-wifi-hal=yes,--enable-rdk-wifi-hal=no,virtual/wifi-hal,virtual/wifi-hal"
 PACKAGECONFIG[lostfound] = "--enable-lost-found=yes,--enable-lost-found=no,lostandfound,lostandfound"
@@ -68,6 +73,9 @@ do_install_append() {
         install -d ${D}${bindir}
         install -d ${D}${sysconfdir}
         install -d ${D}${systemd_unitdir}/system
+
+        sed -i '/CONNECTIVITY_ENDPOINT_1/c CONNECTIVITY_ENDPOINT_1=${CONNECTIVITY_ENDPOINT_1}' ${S}/conf/netsrvmgr.conf
+        sed -i '/CONNECTIVITY_ENDPOINT_1/c CONNECTIVITY_ENDPOINT_1=${CONNECTIVITY_ENDPOINT_1}' ${S}/conf/netsrvmgr.conf.tv
 
         install -m 0644 ${S}/conf/netsrvmgr.conf ${D}${sysconfdir}
         install -m 0644 ${S}/conf/netsrvmgr_Telemetry_LoggingParams.json ${D}${sysconfdir}
@@ -94,6 +102,7 @@ do_install_append() {
             install -m 0755 ${S}/pni_controller.sh ${D}${base_libdir}/rdk/
             install -m 0755 ${S}/wifi_addr_reset.sh ${D}${base_libdir}/rdk/
         fi
+
 }
 
 PACKAGE_BEFORE_PN += "${PN}-pni-controller ${PN}-pni-settings-loader"
