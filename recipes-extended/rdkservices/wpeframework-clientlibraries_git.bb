@@ -11,18 +11,14 @@ SRC_URI = "git://github.com/rdkcentral/ThunderClientLibraries.git;protocol=git;b
            file://0001-link-secapi-crypto.patch \
            file://0026-Send_empty_buffer_on_noBoundKeyMsg.patch \
            file://0002-openssl-api-based-on-openssl-version.patch \
-           file://0001-RDK-31882-Add-GstCaps-parsing-in-OCDM-to-wpeframework-clientlibraries.patch \
-           file://0001-RDK-29803-SoC-Independent-SVP-support.patch \
            file://0001-IPersistent_API_Cobalt.patch \
-           file://0008-added-opencdm_gstreamer_transform_caps-method.patch \
-           file://0009-DELIA-51340.patch \
-           file://opencdm_system_supports_server_certificate.patch \
            file://0001-SecurityUtilityApp-input-args-support.patch \
+           file://0001-OCDM-enhancement-for-BCOM-ocdm-adapter.patch \
+           file://0001-OCDM-enhancement-for-rdk-ocdm-adapter.patch \
            "
 
-# Jul 20, 2022; R2-v1.11 HASH; https://github.com/rdkcentral/ThunderClientLibraries/commit/d3e3d6c2be6516dd6b4ccfc04b129f8725b59baa
-SRCREV_wpeframework-clientlibraries = "d3e3d6c2be6516dd6b4ccfc04b129f8725b59baa"
-
+# Sep 29, 2022
+SRCREV_wpeframework-clientlibraries = "adf82a27efed27ab7bc4208b6f9579f2dcc86a71"
 
 # ----------------------------------------------------------------------------
 

@@ -26,6 +26,7 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            file://0001-RDK-39924-Launch-Airplay-App-from-Airplay-icon-sel.patch \
            file://0001-RDK-41681-Update-TextToSpeech-Implementation.patch \
            file://0001-RDK-41681-PR4013.patch \
+           file://0001-rdkservices_cbcs_changes.patch \
           "
 
 # June 02 2023
@@ -50,6 +51,7 @@ CXXFLAGS += " -I${STAGING_DIR_TARGET}${includedir}/wdmp-c/ "
 CXXFLAGS += " -I${STAGING_DIR_TARGET}${includedir}/trower-base64/ "
 CXXFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'build_rfc_enabled',"-DRFC_ENABLED ","", d)}"
 CXXFLAGS += " -Wall -Werror "
+SELECTED_OPTIMIZATION_append = " -Wno-deprecated-declarations"
 
 # More complicated plugins are moved seperate includes
 include include/compositor.inc

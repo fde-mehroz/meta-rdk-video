@@ -1,0 +1,861 @@
+From 4d6b844a04d1d3689d4b207def286eceeaa320d4 Mon Sep 17 00:00:00 2001
+From: kkanag314 <krishnapriya_kanagaraj@comcast.com>
+Date: Wed, 19 Apr 2023 18:46:42 +0000
+Subject: [PATCH] bcom adapter changes
+
+---
+ Source/ocdm/CapsParser.cpp                    |  11 +-
+ Source/ocdm/IOCDM.h                           |   3 +
+ .../broadcom-svp-secbuf/open_cdm_adapter.cpp  | 327 +++++++++++++++++-
+ .../adapter/gstreamer/open_cdm_adapter.cpp    |  85 +++--
+ Source/ocdm/adapter/open_cdm_adapter.h        |  28 ++
+ Source/ocdm/open_cdm.cpp                      |  19 +
+ Source/ocdm/open_cdm.h                        |  16 +-
+ Source/ocdm/open_cdm_impl.h                   |  35 +-
+ 8 files changed, 482 insertions(+), 42 deletions(-)
+
+diff --git a/Source/ocdm/CapsParser.cpp b/Source/ocdm/CapsParser.cpp
+index 8145142..c9612c7 100644
+--- a/Source/ocdm/CapsParser.cpp
++++ b/Source/ocdm/CapsParser.cpp
+@@ -63,7 +63,16 @@ namespace WPEFramework {
+                         }
+                     }
+                     else {
+-                        TRACE(Trace::Warning, (_T("No result for media type")));
++                        if(strcasestr((const char*)info, "audio") != NULL) {
++                            _mediaType = CDMi::Audio;
++                        }
++                        else if(strcasestr((const char*)info, "video") != NULL) {
++                            _mediaType = CDMi::Video;
++                        }
++                        else
++                        {
++                            TRACE(Trace::Warning, (_T("No result for media type")));
++                        }
+                     }
+ 
+                     if(_mediaType == CDMi::Video) {
+diff --git a/Source/ocdm/IOCDM.h b/Source/ocdm/IOCDM.h
+index 21544e0..2afecc4 100644
+--- a/Source/ocdm/IOCDM.h
++++ b/Source/ocdm/IOCDM.h
+@@ -119,6 +119,9 @@ struct ISession : virtual public Core::IUnknown {
+     // Let the CDM know playback has stopped in order to disable output protection
+     virtual void ResetOutputProtection() = 0;
+ 
++    // Set a name/value pair into the CDM
++    virtual void SetParameter(const std::string& name, const std::string& value) = 0;
++
+     // During instantiation a callback is set, here we can decouple.
+     virtual void Revoke(ISession::ICallback* callback) = 0;
+ };
+diff --git a/Source/ocdm/adapter/broadcom-svp-secbuf/open_cdm_adapter.cpp b/Source/ocdm/adapter/broadcom-svp-secbuf/open_cdm_adapter.cpp
+index 8682794..dfbbe24 100644
+--- a/Source/ocdm/adapter/broadcom-svp-secbuf/open_cdm_adapter.cpp
++++ b/Source/ocdm/adapter/broadcom-svp-secbuf/open_cdm_adapter.cpp
+@@ -18,12 +18,15 @@
+  */
+ 
+ #include "open_cdm_adapter.h"
++#include "open_cdm_impl.h"
++#include "Module.h"
+ 
+ #include <gst/gst.h>
+ #include <gst/base/gstbytereader.h>
+ 
+ #include <gst_svp_meta.h>
+ #include "b_secbuf.h"
++#include "../CapsParser.h"
+ 
+ struct Rpc_Secbuf_Info {
+     uint8_t *ptr;
+@@ -31,6 +34,12 @@ struct Rpc_Secbuf_Info {
+     size_t   size;
+     void    *token;
+ };
++
++OpenCDMError opencdm_gstreamer_transform_caps(GstCaps** caps)
++{
++    return (ERROR_NONE);
++}
++
+ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, GstBuffer* buffer, GstBuffer* subSampleBuffer, const uint32_t subSampleCount,
+                                                GstBuffer* IV, GstBuffer* keyID, uint32_t initWithLast15)
+ {
+@@ -39,6 +48,11 @@ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, G
+     struct Rpc_Secbuf_Info sb_info;
+ 
+     if (session != nullptr) {
++        if (subSampleBuffer == NULL && IV == NULL && keyID == NULL) {
++            // no encrypted data, skip decryption...
++            return(ERROR_NONE);
++        }
++
+         GstMapInfo dataMap;
+         if (gst_buffer_map(buffer, &dataMap, (GstMapFlags) GST_MAP_READWRITE) == false) {
+             fprintf(stderr, "Invalid buffer.\n");
+@@ -51,28 +65,50 @@ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, G
+             fprintf(stderr, "Invalid IV buffer.\n");
+             return (ERROR_INVALID_DECRYPT_BUFFER);
+         }
+-
++        
++        uint8_t *mappedKeyID = nullptr;
++        uint32_t mappedKeyIDSize = 0;
+         GstMapInfo keyIDMap;
+-        if (gst_buffer_map(keyID, &keyIDMap, (GstMapFlags) GST_MAP_READ) == false) {
+-            gst_buffer_unmap(buffer, &dataMap);
+-            gst_buffer_unmap(IV, &ivMap);
+-            fprintf(stderr, "Invalid keyID buffer.\n");
+-            return (ERROR_INVALID_DECRYPT_BUFFER);
++        if (keyID != nullptr) {
++            if (gst_buffer_map(keyID, &keyIDMap, (GstMapFlags) GST_MAP_READ) == false) {
++                gst_buffer_unmap(buffer, &dataMap);
++                gst_buffer_unmap(IV, &ivMap);
++                fprintf(stderr, "Invalid keyID buffer.\n");
++                return (ERROR_INVALID_DECRYPT_BUFFER);
++            }
++            mappedKeyID = reinterpret_cast<uint8_t* >(keyIDMap.data);
++            mappedKeyIDSize =  static_cast<uint32_t >(keyIDMap.size);
++        }
++
++        //Set the Encryption Scheme and Pattern to defaults.
++        EncryptionScheme encScheme = AesCtr_Cenc;
++        EncryptionPattern pattern = {0, 0};
++
++        //Lets try to get Enc Scheme and Pattern from the Protection Metadata.
++        GstProtectionMeta* protectionMeta = reinterpret_cast<GstProtectionMeta*>(gst_buffer_get_protection_meta(buffer));
++        if (protectionMeta != NULL) {
++            const char* cipherModeBuf = gst_structure_get_string(protectionMeta->info, "cipher-mode");
++            if(g_strcmp0(cipherModeBuf,"cbcs") == 0) {
++                encScheme = AesCbc_Cbcs;
++            }
++
++            gst_structure_get_uint(protectionMeta->info, "crypt_byte_block", &pattern.encrypted_blocks);
++            gst_structure_get_uint(protectionMeta->info, "skip_byte_block", &pattern.clear_blocks);
+         }
+ 
+         uint8_t *mappedData = reinterpret_cast<uint8_t* >(dataMap.data);
+         uint32_t mappedDataSize = static_cast<uint32_t >(dataMap.size);
+-		 uint8_t *mappedIV = reinterpret_cast<uint8_t* >(ivMap.data);
++        uint8_t *mappedIV = reinterpret_cast<uint8_t* >(ivMap.data);
+         uint32_t mappedIVSize = static_cast<uint32_t >(ivMap.size);
+-        uint8_t *mappedKeyID = reinterpret_cast<uint8_t* >(keyIDMap.data);
+-        uint32_t mappedKeyIDSize = static_cast<uint32_t >(keyIDMap.size);
+ 
+         if (subSampleBuffer != nullptr) {
+             GstMapInfo sampleMap;
+ 
+             if (gst_buffer_map(subSampleBuffer, &sampleMap, GST_MAP_READ) == false) {
+                 fprintf(stderr, "Invalid subsample buffer.\n");
+-                gst_buffer_unmap(keyID, &keyIDMap);
++                if (keyID != nullptr) {
++                    gst_buffer_unmap(keyID, &keyIDMap);
++                }
+                 gst_buffer_unmap(IV, &ivMap);
+                 gst_buffer_unmap(buffer, &dataMap);
+                 return (ERROR_INVALID_DECRYPT_BUFFER);
+@@ -111,7 +147,7 @@ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, G
+                 }
+                 gst_byte_reader_set_pos(reader, 0);
+ 
+-                result = opencdm_session_decrypt(session, encryptedData, totalEncrypted, mappedIV, mappedIVSize, mappedKeyID, mappedKeyIDSize, initWithLast15);
++                result = opencdm_session_decrypt(session, encryptedData, totalEncrypted, encScheme, pattern, mappedIV, mappedIVSize, mappedKeyID, mappedKeyIDSize, initWithLast15);
+ 
+                 if(result == ERROR_NONE) {
+                     memcpy(&sb_info, encryptedData, sizeof(Rpc_Secbuf_Info));
+@@ -119,7 +155,7 @@ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, G
+                         fprintf(stderr, "B_Secbuf_AllocWithToken() failed!\n");
+                         fprintf(stderr, "%u subsamples, totalEncrypted: %u, sb_inf: ptr=%p, type=%i, size=%i, token=%p\n", subSampleCount, totalEncrypted, sb_info.ptr, sb_info.type, sb_info.size, sb_info.token);
+                     }
+-                    gst_buffer_append_svp_transform(buffer, subSampleBuffer, subSampleCount, (uint32_t) sb_info.ptr);
++                    gst_buffer_append_svp_transform(NULL, buffer, subSampleBuffer, subSampleCount, (guint8*) sb_info.ptr);
+                 }
+                 g_free(encryptedData);
+             } else {
+@@ -138,7 +174,7 @@ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, G
+             fEncryptedData = encryptedData;
+             memcpy(encryptedData, mappedData, mappedDataSize);
+ 
+-            result = opencdm_session_decrypt(session, encryptedData, totalEncryptedSize, mappedIV, mappedIVSize, mappedKeyID, mappedKeyIDSize, initWithLast15);
++            result = opencdm_session_decrypt(session, encryptedData, totalEncryptedSize, encScheme, pattern, mappedIV, mappedIVSize, mappedKeyID, mappedKeyIDSize, initWithLast15);
+ 
+             if(result == ERROR_NONE){
+                memcpy(&sb_info, fEncryptedData, sizeof(Rpc_Secbuf_Info));
+@@ -146,14 +182,275 @@ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, G
+                     fprintf(stderr, "B_Secbuf_AllocWithToken() failed!\n");
+                     fprintf(stderr, "no subsamples, encrypted size: %u, sb_inf: ptr=%p, type=%i, size=%i, token=%p\n", totalEncryptedSize, sb_info.ptr, sb_info.type, sb_info.size, sb_info.token);
+                }
+-               gst_buffer_append_svp_transform(buffer, NULL, mappedDataSize, (uint32_t) sb_info.ptr);
++               gst_buffer_append_svp_transform(NULL, buffer, NULL, mappedDataSize, (guint8*) sb_info.ptr);
+             }
+             g_free(fEncryptedData);
+         }
+-        gst_buffer_unmap(keyID, &keyIDMap);
++        if (keyID != nullptr) {
++            gst_buffer_unmap(keyID, &keyIDMap);
++        }
+         gst_buffer_unmap(IV, &ivMap);
+         gst_buffer_unmap(buffer, &dataMap);
+     }
+ 
+     return (result);
+ }
++
++OpenCDMError opencdm_gstreamer_session_decrypt_ex(struct OpenCDMSession* session, GstBuffer* buffer, GstBuffer* subSampleBuffer, const uint32_t subSampleCount,
++                                                  GstBuffer* IV, GstBuffer* keyID, uint32_t initWithLast15, GstCaps* caps)
++{
++    OpenCDMError result (ERROR_INVALID_SESSION);
++
++    if(session != nullptr) {
++       if(subSampleBuffer == NULL && IV == NULL && keyID == NULL) {
++           // no encrypted data, skip decryption...
++       return(ERROR_NONE);
++    }
++
++        GstProtectionMeta* protectionMeta = reinterpret_cast<GstProtectionMeta*>(gst_buffer_get_protection_meta(buffer));
++        if (protectionMeta != nullptr) {
++            gst_structure_set (protectionMeta->info, "subsample_count", G_TYPE_UINT, subSampleCount, "subsamples", GST_TYPE_BUFFER, subSampleBuffer, "iv", GST_TYPE_BUFFER, IV, "kid", GST_TYPE_BUFFER, keyID, NULL);
++        } else {
++            GstStructure *crypto_info = gst_structure_new ("protection_meta_info","subsample_count", G_TYPE_UINT, subSampleCount, "subsamples", GST_TYPE_BUFFER, subSampleBuffer, "iv", GST_TYPE_BUFFER, IV, "kid", GST_TYPE_BUFFER, keyID, NULL);
++            gst_buffer_add_protection_meta (buffer, crypto_info);
++        }
++ 
++        return opencdm_gstreamer_session_decrypt_buffer(session,buffer,caps);
++        } else {
++           return result;
++     }
++}
++
++OpenCDMError opencdm_gstreamer_session_decrypt_buffer(struct OpenCDMSession* session, GstBuffer* buffer, GstCaps* caps) {
++
++    OpenCDMError result (ERROR_INVALID_SESSION);
++
++    struct Rpc_Secbuf_Info sb_info;
++    if (session != nullptr) {
++
++        GstMapInfo dataMap;
++        if (gst_buffer_map(buffer, &dataMap, (GstMapFlags) GST_MAP_READWRITE) == false) {
++
++            TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Invalid buffer.");
++            result = ERROR_INVALID_DECRYPT_BUFFER;
++            goto exit;
++        }
++        
++        media_type mediaType = Data;
++        uint8_t *mappedData = reinterpret_cast<uint8_t* >(dataMap.data);
++        uint32_t mappedDataSize = static_cast<uint32_t >(dataMap.size);
++
++        //Check if Protection Metadata is available in Buffer
++        GstProtectionMeta* protectionMeta = reinterpret_cast<GstProtectionMeta*>(gst_buffer_get_protection_meta(buffer));
++        if (protectionMeta != nullptr) {
++            const GValue* value;
++
++            //Get Subsample mapping
++            unsigned subSampleCount = 0;
++            GstBuffer* subSample = nullptr;
++            if (!gst_structure_get_uint(protectionMeta->info, "subsample_count", &subSampleCount)) {
++                printf("No Subsample Count.\n");
++            }
++
++            GstMapInfo sampleMap;
++            uint8_t *mappedSubSample = nullptr;
++            uint32_t mappedSubSampleSize = 0;
++            if (subSampleCount > 0) {
++                value = gst_structure_get_value(protectionMeta->info, "subsamples");
++                if (!value) {
++                    TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: No subsample buffer.");
++                    result = ERROR_INVALID_DECRYPT_BUFFER;
++                    goto exit;
++                }
++                subSample = gst_value_get_buffer(value);
++                GstMapInfo sampleMap;
++                if (subSample != nullptr && gst_buffer_map(subSample, &sampleMap, GST_MAP_READ) == false) {
++                    TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Invalid subsample buffer.");
++                    gst_buffer_unmap(buffer, &dataMap);
++                    result = ERROR_INVALID_DECRYPT_BUFFER;
++                    goto exit;
++                }
++                mappedSubSample = reinterpret_cast<uint8_t* >(sampleMap.data);
++                mappedSubSampleSize = static_cast<uint32_t >(sampleMap.size);
++                ASSERT(mappedSubSampleSize==subSampleCount);
++            }
++
++            //Get IV
++            value = gst_structure_get_value(protectionMeta->info, "iv");
++            if (!value) {
++                TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Missing IV buffer.");
++                result = ERROR_INVALID_DECRYPT_BUFFER;
++                goto exit;
++            }
++            GstBuffer* IV = gst_value_get_buffer(value);
++            GstMapInfo ivMap;
++            if (gst_buffer_map(IV, &ivMap, (GstMapFlags) GST_MAP_READ) == false) {
++                TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Invalid IV buffer.");
++                gst_buffer_unmap(buffer, &dataMap);
++                gst_buffer_unmap(subSample, &sampleMap);
++                result = ERROR_INVALID_DECRYPT_BUFFER;
++                goto exit;
++            }
++            uint8_t *mappedIV = reinterpret_cast<uint8_t* >(ivMap.data);
++            uint32_t mappedIVSize = static_cast<uint32_t >(ivMap.size);
++
++            //Get Key ID
++            value = gst_structure_get_value(protectionMeta->info, "kid");
++            if (!value) {
++                TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Missing KeyId buffer.");
++                result = ERROR_INVALID_DECRYPT_BUFFER;
++                goto exit;
++            }
++            GstBuffer* keyID = gst_value_get_buffer(value);
++            uint8_t *mappedKeyID = nullptr;
++            uint32_t mappedKeyIDSize = 0;
++            GstMapInfo keyIDMap;
++            if (keyID != nullptr && gst_buffer_map(keyID, &keyIDMap, (GstMapFlags) GST_MAP_READ) == false) {
++                TRACE_L1("Invalid keyID buffer.");
++                gst_buffer_unmap(buffer, &dataMap);
++                gst_buffer_unmap(subSample, &sampleMap);
++                gst_buffer_unmap(IV, &ivMap);
++                result = ERROR_INVALID_DECRYPT_BUFFER;
++                goto exit;
++            }
++            mappedKeyID = reinterpret_cast<uint8_t* >(keyIDMap.data);
++            mappedKeyIDSize = static_cast<uint32_t >(keyIDMap.size);
++
++            //Get Encryption Scheme and Pattern
++            EncryptionScheme encScheme = AesCtr_Cenc;
++            EncryptionPattern pattern = {0, 0};
++            const char* cipherModeBuf = gst_structure_get_string(protectionMeta->info, "cipher-mode");
++            if(g_strcmp0(cipherModeBuf,"cbcs") == 0) {
++                encScheme = AesCbc_Cbcs;
++            }
++            gst_structure_get_uint(protectionMeta->info, "crypt_byte_block", &pattern.encrypted_blocks);
++            gst_structure_get_uint(protectionMeta->info, "skip_byte_block", &pattern.clear_blocks);
++
++            //Create a SubSampleInfo Array with mapping
++            SubSampleInfo * subSampleInfoPtr = nullptr;
++            uint32_t total_encrypted_bytes = 0;
++            if (subSample != nullptr) {
++                GstByteReader* reader = gst_byte_reader_new(mappedSubSample, mappedSubSampleSize);
++                subSampleInfoPtr = reinterpret_cast<SubSampleInfo*>(malloc(subSampleCount * sizeof(SubSampleInfo)));
++                for (unsigned int position = 0; position < subSampleCount; position++) {
++
++                    gst_byte_reader_get_uint16_be(reader, &subSampleInfoPtr[position].clear_bytes);
++                    gst_byte_reader_get_uint32_be(reader, &subSampleInfoPtr[position].encrypted_bytes);
++                    total_encrypted_bytes += subSampleInfoPtr[position].encrypted_bytes;
++                }
++                gst_byte_reader_set_pos(reader, 0);
++                gst_byte_reader_free(reader);
++            } else {
++                total_encrypted_bytes = mappedDataSize;
++            }
++
++            std::string perfString(__FUNCTION__);
++            
++            //Get Stream Properties from GstCaps
++            MediaProperties *spPtr = nullptr;
++            if(caps != nullptr){
++                gchar *capsStr = gst_caps_to_string (caps);
++                if (capsStr != nullptr) {
++                    WPEFramework::Plugin::CapsParser capsParser;
++                    MediaProperties streamProperties;
++                    capsParser.Parse(reinterpret_cast<const uint8_t*>(capsStr), strlen(capsStr));
++                    streamProperties.height = capsParser.GetHeight();
++                    streamProperties.width = capsParser.GetWidth();
++                    switch (capsParser.GetMediaType()) {
++                        case CDMi::MediaType::Video:
++                            streamProperties.media_type = MediaType_Video;
++                            mediaType = Video;
++                            perfString += "_Video";
++                        break;
++
++                        case CDMi::MediaType::Audio:
++                            streamProperties.media_type = MediaType_Audio;
++                            mediaType = Audio;
++                            perfString += "_Audio";
++                        break;
++
++                        case CDMi::MediaType::Data:
++                            streamProperties.media_type = MediaType_Data;
++                            mediaType = Data;
++                            perfString += "_Data";
++                        break;
++
++                        default:
++                            streamProperties.media_type = MediaType_Unknown;
++                            perfString += "_Unknown";
++                        break;
++                    }
++                    spPtr = &streamProperties;
++                    g_free(capsStr);
++                } else {
++                    perfString += "_NoGstCaps";
++                    printf("Could not convert caps to string\n");
++                }
++            }
++            GstPerf perf(perfString.c_str());
++
++            SampleInfo sampleInfo;
++            sampleInfo.subSample = subSampleInfoPtr;
++            sampleInfo.subSampleCount = subSampleCount;
++            sampleInfo.scheme = encScheme;
++            sampleInfo.pattern.clear_blocks = pattern.clear_blocks;
++            sampleInfo.pattern.encrypted_blocks = pattern.encrypted_blocks;
++            sampleInfo.iv = mappedIV;
++            sampleInfo.ivLength = mappedIVSize;
++            sampleInfo.keyId = mappedKeyID;
++            sampleInfo.keyIdLength = mappedKeyIDSize;
++            
++            if(total_encrypted_bytes > 0) {
++               uint32_t totalEncrypted = mappedDataSize + svp_token_size(); //make sure it is enough for metadata
++               uint8_t* encryptedData = nullptr;
++               encryptedData = (uint8_t*) g_malloc(totalEncrypted);
++               memcpy(encryptedData, mappedData, mappedDataSize);
++
++               GstPerf* ocdm_perf = new GstPerf("opencdm_session_decrypt_v2");
++               result = opencdm_session_decrypt_v2(session,
++                                                encryptedData,
++                                                totalEncrypted,
++                                                &sampleInfo,
++                                                spPtr);
++               delete ocdm_perf;
++
++               if(result == ERROR_NONE) {
++                  GstPerf* svpTransform_perf3 = new GstPerf("opencdm_svp_transform_subsample");
++                  gst_buffer_append_svp_transform(session->GetSVPContext(), buffer, subSample, subSampleCount, encryptedData, mappedDataSize);
++                  delete svpTransform_perf3;
++               }
++               g_free(encryptedData);
++               } else {
++               // no encrypted data, skip decryption...
++               result = ERROR_NONE;
++               }
++
++            //Clean up
++            if(subSampleInfoPtr != nullptr) {
++               free(subSampleInfoPtr);
++            }
++
++            gst_buffer_unmap(buffer, &dataMap);
++
++            if (subSample != nullptr) {
++              gst_buffer_unmap(subSample, &sampleMap);
++            }
++
++            if (IV != nullptr) {
++              gst_buffer_unmap(IV, &ivMap);
++            }
++
++            if (keyID != nullptr) {
++              gst_buffer_unmap(keyID, &keyIDMap);
++            }
++        } else {
++            TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Missing Protection Metadata.");
++            result = ERROR_INVALID_DECRYPT_BUFFER;
++        }
++
++    }
++
++exit:
++    return (result);
++}
++
+diff --git a/Source/ocdm/adapter/gstreamer/open_cdm_adapter.cpp b/Source/ocdm/adapter/gstreamer/open_cdm_adapter.cpp
+index 2145782..24d9287 100644
+--- a/Source/ocdm/adapter/gstreamer/open_cdm_adapter.cpp
++++ b/Source/ocdm/adapter/gstreamer/open_cdm_adapter.cpp
+@@ -24,20 +24,9 @@
+ #include <gst/base/gstbytereader.h>
+ #include "../CapsParser.h"
+ 
+-
+-inline bool mappedBuffer(GstBuffer *buffer, bool writable, uint8_t **data, uint32_t *size)
++OpenCDMError opencdm_gstreamer_transform_caps(GstCaps** caps)
+ {
+-    GstMapInfo map;
+-
+-    if (!gst_buffer_map (buffer, &map, writable ? GST_MAP_WRITE : GST_MAP_READ)) {
+-        return false;
+-    }
+-
+-    *data = reinterpret_cast<uint8_t* >(map.data);
+-    *size = static_cast<uint32_t >(map.size);
+-    gst_buffer_unmap (buffer, &map);
+-
+-    return true;
++    return (ERROR_NONE);
+ }
+ 
+ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, GstBuffer* buffer, GstBuffer* subSampleBuffer, const uint32_t subSampleCount,
+@@ -46,6 +35,11 @@ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, G
+     OpenCDMError result (ERROR_INVALID_SESSION);
+ 
+     if (session != nullptr) {
++        if (subSampleBuffer == NULL && IV == NULL && keyID == NULL) {
++            // no encrypted data, skip decryption...
++            return(ERROR_NONE);
++        }
++
+         GstMapInfo dataMap;
+         if (gst_buffer_map(buffer, &dataMap, (GstMapFlags) GST_MAP_READWRITE) == false) {
+             printf("Invalid buffer.\n");
+@@ -167,6 +161,16 @@ OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, G
+     return (result);
+ }
+ 
++OpenCDMError opencdm_gstreamer_session_decrypt_ex(struct OpenCDMSession* session, GstBuffer* buffer, GstBuffer* subSampleBuffer, const uint32_t subSampleCount,
++                                                  GstBuffer* IV, GstBuffer* keyID, uint32_t initWithLast15, GstCaps* caps)
++{
++       GstProtectionMeta* protectionMeta = reinterpret_cast<GstProtectionMeta*>(gst_buffer_get_protection_meta(buffer));
++       if (protectionMeta != nullptr) {
++           gst_structure_set (protectionMeta->info, "subsample_count", G_TYPE_UINT, subSampleCount, "subsamples", GST_TYPE_BUFFER, subSampleBuffer, "iv", GST_TYPE_BUFFER, IV, "kid", GST_TYPE_BUFFER, keyID, NULL);
++       }
++
++       return opencdm_gstreamer_session_decrypt_buffer(session, buffer, caps);
++}
+ 
+ OpenCDMError opencdm_gstreamer_session_decrypt_buffer(struct OpenCDMSession* session, GstBuffer* buffer, GstCaps* caps) {
+ 
+@@ -174,14 +178,15 @@ OpenCDMError opencdm_gstreamer_session_decrypt_buffer(struct OpenCDMSession* ses
+ 
+     if (session != nullptr) {
+ 
+-        uint8_t *mappedData = nullptr;
+-        uint32_t mappedDataSize = 0;
+-        if (mappedBuffer(buffer, true, &mappedData, &mappedDataSize) == false) {
++        GstMapInfo dataMap;
++        if (gst_buffer_map(buffer, &dataMap, (GstMapFlags) GST_MAP_READWRITE) == false) {
+ 
+             TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Invalid buffer.");
+             result = ERROR_INVALID_DECRYPT_BUFFER;
+             goto exit;
+         }
++        uint8_t *mappedData = reinterpret_cast<uint8_t* >(dataMap.data);
++        uint32_t mappedDataSize = static_cast<uint32_t >(dataMap.size);
+ 
+         //Check if Protection Metadata is available in Buffer
+         GstProtectionMeta* protectionMeta = reinterpret_cast<GstProtectionMeta*>(gst_buffer_get_protection_meta(buffer));
+@@ -190,26 +195,32 @@ OpenCDMError opencdm_gstreamer_session_decrypt_buffer(struct OpenCDMSession* ses
+ 
+             //Get Subsample mapping
+             unsigned subSampleCount = 0;
+-            GstBuffer* subSample = nullptr;
+             if (!gst_structure_get_uint(protectionMeta->info, "subsample_count", &subSampleCount)) {
+                 printf("No Subsample Count.\n");
+             }
++           
++            GstBuffer* subSample = nullptr;	
++            GstMapInfo sampleMap;
+             uint8_t *mappedSubSample = nullptr;
+             uint32_t mappedSubSampleSize = 0;
+-
+             if (subSampleCount > 0) {
+                 value = gst_structure_get_value(protectionMeta->info, "subsamples");
+                 if (!value) {
+                     TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: No subsample buffer.");
++                    gst_buffer_unmap(buffer, &dataMap);
+                     result = ERROR_INVALID_DECRYPT_BUFFER;
+                     goto exit;
+                 }
++
+                 subSample = gst_value_get_buffer(value);
+-                if (subSample != nullptr && mappedBuffer(subSample, false, &mappedSubSample, &mappedSubSampleSize) == false) {
++                if (subSample != nullptr && gst_buffer_map(subSample, &sampleMap, GST_MAP_READ) == false) {
+                     TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Invalid subsample buffer.");
++                    gst_buffer_unmap(buffer, &dataMap);
+                     result = ERROR_INVALID_DECRYPT_BUFFER;
+                     goto exit;
+                 }
++                mappedSubSample = reinterpret_cast<uint8_t* >(sampleMap.data);
++                mappedSubSampleSize = static_cast<uint32_t >(sampleMap.size);
+                 ASSERT(mappedSubSampleSize==subSampleCount);
+             }
+ 
+@@ -217,33 +228,49 @@ OpenCDMError opencdm_gstreamer_session_decrypt_buffer(struct OpenCDMSession* ses
+             value = gst_structure_get_value(protectionMeta->info, "iv");
+             if (!value) {
+                 TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Missing IV buffer.");
++                gst_buffer_unmap(buffer, &dataMap);
++                gst_buffer_unmap(subSample, &sampleMap);
+                 result = ERROR_INVALID_DECRYPT_BUFFER;
+                 goto exit;
+             }
++
+             GstBuffer* IV = gst_value_get_buffer(value);
+-            uint8_t *mappedIV = nullptr;    //Set the Encryption Scheme and Pattern to defaults.
+-            uint32_t mappedIVSize = 0;
+-            if (mappedBuffer(IV, false, &mappedIV, &mappedIVSize) == false) {
++            GstMapInfo ivMap;
++            if (gst_buffer_map(IV, &ivMap, (GstMapFlags) GST_MAP_READ) == false) {
+                 TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Invalid IV buffer.");
++                gst_buffer_unmap(buffer, &dataMap);
++                gst_buffer_unmap(subSample, &sampleMap);
+                 result = ERROR_INVALID_DECRYPT_BUFFER;
+                 goto exit;
+             }
++            uint8_t *mappedIV = reinterpret_cast<uint8_t* >(ivMap.data);
++            uint32_t mappedIVSize = static_cast<uint32_t >(ivMap.size);
+ 
+             //Get Key ID
+             value = gst_structure_get_value(protectionMeta->info, "kid");
+             if (!value) {
+                 TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Missing KeyId buffer.");
++                gst_buffer_unmap(buffer, &dataMap);
++                gst_buffer_unmap(subSample, &sampleMap);
++                gst_buffer_unmap(IV, &ivMap);
+                 result = ERROR_INVALID_DECRYPT_BUFFER;
+                 goto exit;
+             }
++            
+             GstBuffer* keyID = gst_value_get_buffer(value);
+             uint8_t *mappedKeyID = nullptr;
+             uint32_t mappedKeyIDSize = 0;
+-            if (keyID != nullptr && mappedBuffer(keyID, false, &mappedKeyID, &mappedKeyIDSize) == false) {
++            GstMapInfo keyIDMap;
++            if (keyID != nullptr && gst_buffer_map(keyID, &keyIDMap, (GstMapFlags) GST_MAP_READ) == false) {
+                 TRACE_L1("Invalid keyID buffer.");
++                gst_buffer_unmap(buffer, &dataMap);
++                gst_buffer_unmap(subSample, &sampleMap);
++                gst_buffer_unmap(IV, &ivMap);
+                 result = ERROR_INVALID_DECRYPT_BUFFER;
+                 goto exit;
+             }
++            mappedKeyID = reinterpret_cast<uint8_t* >(keyIDMap.data);
++            mappedKeyIDSize = static_cast<uint32_t >(keyIDMap.size);
+ 
+             //Get Encryption Scheme and Pattern
+             EncryptionScheme encScheme = AesCtr_Cenc;
+@@ -324,6 +351,18 @@ OpenCDMError opencdm_gstreamer_session_decrypt_buffer(struct OpenCDMSession* ses
+             if(subSampleInfoPtr != nullptr) {
+                free(subSampleInfoPtr);
+            }
++
++           gst_buffer_unmap(buffer, &dataMap);
++
++           if (subSample != nullptr) {
++             gst_buffer_unmap(subSample, &sampleMap);
++           }
++
++           gst_buffer_unmap(IV, &ivMap);
++           
++           if (keyID != nullptr) {
++             gst_buffer_unmap(keyID, &keyIDMap);
++           }
+         } else {
+             TRACE_L1("opencdm_gstreamer_session_decrypt_buffer: Missing Protection Metadata.");
+             result = ERROR_INVALID_DECRYPT_BUFFER;
+diff --git a/Source/ocdm/adapter/open_cdm_adapter.h b/Source/ocdm/adapter/open_cdm_adapter.h
+index 404baf3..be96af0 100644
+--- a/Source/ocdm/adapter/open_cdm_adapter.h
++++ b/Source/ocdm/adapter/open_cdm_adapter.h
+@@ -58,6 +58,25 @@ extern "C" {
+     EXTERNAL OpenCDMError opencdm_gstreamer_session_decrypt(struct OpenCDMSession* session, GstBuffer* buffer, GstBuffer* subSample, const uint32_t subSampleCount,
+                                                    GstBuffer* IV, GstBuffer* keyID, uint32_t initWithLast15);
+ 
++/**
++ * \brief Performs decryption based on adapter implementation.
++ *
++ * This method accepts encrypted data and will typically decrypt it out-of-process (for security reasons). The actual data copying is performed
++ * using a memory-mapped file (for performance reasons). If the DRM system allows access to decrypted data (i.e. decrypting is not
++ * performed in a TEE), the decryption is performed in-place.
++ * \param session \ref OpenCDMSession instance.
++ * \param buffer Gstreamer buffer containing encrypted data and related meta data. If applicable, decrypted data will be stored here after this call returns.
++ * \param subSample Gstreamer buffer containing subsamples size which has been parsed from protection meta data.
++ * \param subSampleCount count of subsamples
++ * \param IV Gstreamer buffer containing initial vector (IV) used during decryption.
++ * \param keyID Gstreamer buffer containing keyID to use for decryption
++ * \param initWithLast15 Init flag
++ * \param caps GstCaps structure
++ * \return Zero on success, non-zero on error.
++ */
++    EXTERNAL OpenCDMError opencdm_gstreamer_session_decrypt_ex(struct OpenCDMSession* session, GstBuffer* buffer, GstBuffer* subSample, const uint32_t subSampleCount,
++                                                   GstBuffer* IV, GstBuffer* keyID, uint32_t initWithLast15, GstCaps* caps = NULL);
++
+ /**
+  * \brief Performs decryption based on adapter implementation.
+  *
+@@ -88,6 +107,15 @@ extern "C" {
+     
+     EXTERNAL OpenCDMError opencdm_gstreamer_session_decrypt_buffer(struct OpenCDMSession* session, GstBuffer* buffer, GstCaps* caps);
+ 
++/**
++ * \brief adds SVP related features to the caps structure (only if needed by the platform)
++ *
++ * \param caps GstCaps to be updated
++ *
++ * \return Zero on success, non-zero on error.
++ */
++
++    EXTERNAL OpenCDMError opencdm_gstreamer_transform_caps(GstCaps** caps);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/Source/ocdm/open_cdm.cpp b/Source/ocdm/open_cdm.cpp
+index 8aafae7..56f28c7 100644
+--- a/Source/ocdm/open_cdm.cpp
++++ b/Source/ocdm/open_cdm.cpp
+@@ -436,6 +436,25 @@ OpenCDMError opencdm_session_resetoutputprotection(struct OpenCDMSession* sessio
+     return (result);
+ }
+ 
++/**
++ * Set a name/value pair into the CDM
++ * \param session \ref OpenCDMSession instance.
++ * \return Zero on success, non-zero on error.
++ */
++OpenCDMError opencdm_session_set_parameter(struct OpenCDMSession* session,
++    const std::string& name,
++    const std::string& value)
++{
++    OpenCDMError result(ERROR_INVALID_SESSION);
++
++    if (session != nullptr) {
++        session->SetParameter(name, value);
++        result = OpenCDMError::ERROR_NONE;
++    }
++
++    return (result);
++}
++
+ /**
+  * Closes a session.
+  * \param session \ref OpenCDMSession instance.
+diff --git a/Source/ocdm/open_cdm.h b/Source/ocdm/open_cdm.h
+index 60547c3..d7ca92d 100644
+--- a/Source/ocdm/open_cdm.h
++++ b/Source/ocdm/open_cdm.h
+@@ -56,6 +56,7 @@
+ 
+ #include <stdint.h>
+ #include <string.h>
++#include <string>
+ 
+ #include <stdio.h>
+ 
+@@ -124,7 +125,7 @@ typedef enum
+     MediaType_Video,
+     MediaType_Audio,
+     MediaType_Data
+-} MediaType;
++} OcdmMediaType;
+ 
+ //CENC3.0 pattern is a number of encrypted blocks followed a number of clear blocks after which the pattern repeats.
+ typedef struct {
+@@ -152,7 +153,7 @@ typedef struct {
+ typedef struct {
+     uint16_t height;
+     uint16_t width;
+-    MediaType media_type;
++    OcdmMediaType media_type;
+ } MediaProperties;
+ 
+ 
+@@ -465,6 +466,17 @@ EXTERNAL OpenCDMError opencdm_session_metadata(const struct OpenCDMSession* sess
+  */
+ EXTERNAL OpenCDMError opencdm_session_resetoutputprotection(struct OpenCDMSession* session);
+ 
++/**
++ * Set a name/value pair into the CDM
++ * \param session \ref OpenCDMSession instance.
++ * \param name \ref Name of parameter
++ * \param value \ref Value of parameter
++ * \return Zero on success, non-zero on error.
++ */
++OpenCDMError opencdm_session_set_parameter(struct OpenCDMSession* session,
++    const std::string& name,
++    const std::string& value);
++
+ /**
+  * Gets Session ID for a session.
+  * \param session \ref OpenCDMSession instance.
+diff --git a/Source/ocdm/open_cdm_impl.h b/Source/ocdm/open_cdm_impl.h
+index dd57a84..d76f6e2 100644
+--- a/Source/ocdm/open_cdm_impl.h
++++ b/Source/ocdm/open_cdm_impl.h
+@@ -27,6 +27,10 @@
+ 
+ #include <atomic>
+ 
++#ifdef USE_SVP
++#include "gst_svp_meta.h"
++#endif
++
+ using namespace WPEFramework;
+ 
+ extern Core::CriticalSection _systemLock;
+@@ -508,6 +512,9 @@ public:
+         , _errorCode(~0)
+         , _sysError(Exchange::OCDM_RESULT::OCDM_SUCCESS)
+         , _system(system)
++#ifdef USE_SVP
++        , _svpContext(nullptr)
++#endif
+     {
+         OpenCDMAccessor* accessor = OpenCDMAccessor::Instance();
+         std::string bufferId;
+@@ -523,6 +530,13 @@ public:
+             Session(realSession);
+             realSession->Release();
+             accessor->AddSession(this);
++#ifdef USE_SVP
++            gst_svp_ext_get_context(&_svpContext, Server, (unsigned int)this);
++            char buf[25] = { 0 };
++            snprintf(buf, 25, "%X", (unsigned int)this);
++            ASSERT(_session != nullptr);
++            _session->SetParameter("rpcId", buf);
++#endif
+         }
+     }
+ 
+@@ -531,6 +545,10 @@ public:
+     {
+         OpenCDMAccessor* system = OpenCDMAccessor::Instance();
+ 
++#ifdef USE_SVP
++        gst_svp_ext_free_context(_svpContext);
++#endif
++
+         system->RemoveSession(_sessionId);
+ 
+         if (IsValid()) {
+@@ -600,6 +618,12 @@ public:
+ 
+         _session->ResetOutputProtection();
+     }
++inline void SetParameter(const std::string& name, const std::string& value)
++    {
++        ASSERT (_session != nullptr);
++
++        _session->SetParameter(name, value);
++    }
+     inline int Remove()
+     {
+ 
+@@ -808,7 +832,13 @@ protected:
+             _callback->keys_updated_callback(this, _userData);
+         }
+     }
+-
++#ifdef USE_SVP
++public:
++    void* GetSVPContext() const
++    {
++        return _svpContext;
++    }
++#endif
+ private:
+     std::string _sessionId;
+     std::atomic<DataExchange*> _decryptSession;
+@@ -824,5 +854,8 @@ private:
+     uint32_t _errorCode;
+     Exchange::OCDM_RESULT _sysError;
+     OpenCDMSystem* _system;
++#ifdef USE_SVP
++    void* _svpContext;
++#endif
+ };
+ 
+-- 
+2.17.1
+

@@ -2,10 +2,8 @@ SUMMARY = "Host/Native tooling for the Web Platform for Embedded Framework"
 require include/thunder.inc
 
 SRC_URI_append = " \
-                   file://0005-RDKTV-16258-lambda_crash_error.patch \
                    file://0009-Generate-COM-RPC-ProxyStubs-that-support-large-strin.patch \
                   "
-
 inherit cmake pkgconfig native python3native
 
 RDEPENDS_${PN} = "python3"
