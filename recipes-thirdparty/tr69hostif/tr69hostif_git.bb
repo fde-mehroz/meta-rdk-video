@@ -55,6 +55,8 @@ RDEPENDS_${PN} += "${PN}-conf"
 
 RDEPENDS_${PN}_append_client += " netsrvmgr"
 EXTRA_OECONF += "--disable-silent-rules --enable-InterfaceStack --enable-IPv6 --enable-notification --enable-yocto --enable-SpeedTest"
+EXTRA_OECONF += " --enable-parodus"
+
 EXTRA_OECONF_append_hybrid = " --enable-snmpAdapter"
 
 #Enable sd_notify
