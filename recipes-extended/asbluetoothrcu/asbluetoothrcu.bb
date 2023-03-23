@@ -11,7 +11,7 @@ RDEPENDS_${PN} += "qtwebsockets libstdc++ glibc dbus qtbase libudev bluetooth-mg
 
 SRC_URI = "${CMF_GIT_ROOT}/rdk/components/generic/blercudaemon;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};nobranch=1;name=blercudaemon"
 SRCREV_FORMAT = "blercudaemon"
-SRCREV_blercudaemon = "d9bd7fa45d6e262cc5c688b6004534965462ddad"
+SRCREV_blercudaemon = "a2945633b472c5e82ddb14e98d813a0a35e771bb"
 
 SRC_URI_append = " file://0001-AMLOGIC-279-Start-RCU-Daemon-after-btmgr.patch;patchdir=${WORKDIR}/git"
 
