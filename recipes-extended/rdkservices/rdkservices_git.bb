@@ -26,8 +26,8 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
 	   file://0001-RDK-39924-Launch-Airplay-App-from-Airplay-icon-sel.patch \
           "
 
-# Mar 28, 2023
-SRCREV = "43da02a25688782b05428b9162599523ed41c884"
+# Mar 29, 2023
+SRCREV = "1f204d2daaf799978274b7c7586f4732f10c3274"
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "-DCMAKE_SYSROOT=${STAGING_DIR_HOST}"
 
