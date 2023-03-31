@@ -32,7 +32,9 @@ def get_cobalt_config(d):
        return 'libcobalt'
     if bb.utils.contains('DISTRO_FEATURES', 'cobalt-evergreen-full', True, False, d):
        return 'evegreencompatible'
-    return 'evegreencompatible evegreenlite'
+    if bb.utils.contains('DISTRO_FEATURES', 'cobalt_enable_evergreen_lite', True, False, d):
+       return 'evegreencompatible evegreenlite'
+    return 'libcobalt'
 
 PACKAGECONFIG_append = " ${@get_cobalt_config(d)}"
 
