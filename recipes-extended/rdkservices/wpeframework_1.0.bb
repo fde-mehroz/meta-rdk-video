@@ -25,6 +25,7 @@ SRC_URI += "file://0003-OCDM-increase-RPC-comm-timeout.patch \
            file://0001-DEADLOCK-Deadlock-prevention-by-locking-the-ServiceA.patch \
            file://0001-DEADLOCK-Next-to-closing-the-deadlock-on-the-open-of.patch \
            file://to_add_protocols_pkgconfig_sdk.patch \
+           file://0001-Merge-pull-request-705-from-Karthick-Somasundaresan-.patch \
            "
 
 inherit systemd update-rc.d pythonnative
