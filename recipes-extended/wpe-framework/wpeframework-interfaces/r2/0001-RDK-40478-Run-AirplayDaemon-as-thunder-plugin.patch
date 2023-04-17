@@ -1,27 +1,27 @@
-From 9f6d58aef286deefacf1163038c9bc73102d59a8 Mon Sep 17 00:00:00 2001
-From: rgangi643 <ramakrishna_gangisetty@comcast.com>
-Date: Mon, 6 Mar 2023 20:01:48 +0000
+From a18159fea2a27c58e42ad6015f799c438efea881 Mon Sep 17 00:00:00 2001
+From: akhan388 <adnan_khan@comcast.com>
+Date: Tue, 16 May 2023 06:45:19 +0000
 Subject: [PATCH] RDK-40478 : Run AirplayDaemon as thunder plugin
 
-Reason for change: Added events, interface APIs
-Test Procedure: Verify AirplayDaemon Launch use cases
-Risks: New interfaces added
+Reason for change: Adding new events.
+Test Procedure: Change pairing state by HomeKit.
+Risks: New events added
 
-Signed-off-by: rgangi643 <ramakrishna_gangisetty@comcast.com>
+Signed-off-by: akhan388 <adnan_khan@comcast.com>
 ---
- interfaces/IAirplayDaemon.h |  44 +++++++
+ interfaces/IAirplayDaemon.h |  46 ++++++
  interfaces/Ids.h            |   3 +
- jsonrpc/AirplayDaemon.json  | 244 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 291 insertions(+)
+ jsonrpc/AirplayDaemon.json  | 286 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 335 insertions(+)
  create mode 100644 interfaces/IAirplayDaemon.h
  create mode 100644 jsonrpc/AirplayDaemon.json
 
 diff --git a/interfaces/IAirplayDaemon.h b/interfaces/IAirplayDaemon.h
 new file mode 100644
-index 0000000..201f590
+index 0000000..7a933bd
 --- /dev/null
 +++ b/interfaces/IAirplayDaemon.h
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,46 @@
 +#pragma once
 +
 +#include "Module.h"
@@ -51,12 +51,14 @@ index 0000000..201f590
 +                virtual void dispatchAirplayStatusChangeEvent(const string& params) = 0;
 +                virtual void dispatchAirplayInputSourceChangeEvent(const string& params) = 0;
 +                virtual void dispatchAirplayErrorEvent(const string& params) = 0;
++		virtual void dispatchAirplayMetricsEvent(const string& params) = 0;
 +            };
 +
 +            virtual void Register(IAirplayDaemon::INotification* airplayDaemon) = 0;
 +            virtual void Unregister(IAirplayDaemon::INotification* airplayDaemon) = 0;
 +            virtual void FactoryReset() = 0;
 +            virtual uint32_t bringairplayapptoforeground(const string& reason, string& result /* @out */) = 0;
++	    virtual uint32_t setcurrentidentifier(const string& inputsource) = 0;
 +            virtual uint32_t airplayallowtorunappinbackground(const string& appRunInBackground) = 0;
 +            virtual uint32_t setairplayfriendlyname(const string& friendlyName) = 0;
 +            virtual string getairplayfriendlyname() = 0;
@@ -82,10 +84,10 @@ index 0a5250b..5015c79 100644
          ID_STREAM_CONTROL_GEOMETRY,
 diff --git a/jsonrpc/AirplayDaemon.json b/jsonrpc/AirplayDaemon.json
 new file mode 100644
-index 0000000..e923272
+index 0000000..fe8e6bb
 --- /dev/null
 +++ b/jsonrpc/AirplayDaemon.json
-@@ -0,0 +1,244 @@
+@@ -0,0 +1,286 @@
 +{
 +    "$schema": "interface.schema.json",
 +    "jsonrpc": "2.0",
@@ -233,6 +235,32 @@ index 0000000..e923272
 +          }
 +        ]
 +      },
++      "setcurrentidentifier": {
++      "summary": "Request Airplay-Daemon to set the current Input-Source",
++      "params": {
++        "type": "object",
++        "properties": {
++          "command": {
++            "description": "Selected Input-Source using IR Remote.",
++            "type": "string",
++            "example": "HDMI1,HDMI2,AIRPLAY"
++          }
++        }
++      },
++      "result": {
++        "type": "number"
++      },
++      "errors": [
++        {
++          "description": "Airplay is unavailable",
++          "$ref": "#/common/errors/unavailable"
++        },
++        {
++          "description": "Command is not set",
++          "$ref": "#/common/errors/unknownkey"
++        }
++      ]
++    },      
 +      "factoryreset": {
 +        "summary": "Does Airplay factory reset",
 +        "result": {
@@ -327,7 +355,23 @@ index 0000000..e923272
 +            "errorid"
 +        ]
 +      }
-+    }
++    },
++    "airplayMetrics": {
++      "summary": "Event raised to set metrics if isDeviced pair or not",
++      "params": {
++        "type": "object",
++        "properties": {
++          "isDevicePaired": {
++            "description": "Determines the state of Homekit pairing ",
++            "type": "boolean",
++            "example": "true, false"
++          }
++        },
++        "required": [
++          "isDevicePaired"
++        ]
++      }
++    }    
 +  }
 +}
 -- 
