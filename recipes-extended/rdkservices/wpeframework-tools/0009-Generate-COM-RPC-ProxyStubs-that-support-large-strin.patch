@@ -1,0 +1,25 @@
+From af70ddc06e997f8a994efd6bfc0759e5d8637d4e Mon Sep 17 00:00:00 2001
+From: Eugene Mutavchi <Ievgen_Mutavchi@comcast.com>
+Date: Sat, 22 Apr 2023 01:31:37 +0000
+Subject: [PATCH] Generate COM-RPC ProxyStubs that support large strings
+
+---
+ Tools/ProxyStubGenerator/StubGenerator.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Tools/ProxyStubGenerator/StubGenerator.py b/Tools/ProxyStubGenerator/StubGenerator.py
+index ce9d3619..ac176ea7 100755
+--- a/Tools/ProxyStubGenerator/StubGenerator.py
++++ b/Tools/ProxyStubGenerator/StubGenerator.py
+@@ -426,7 +426,7 @@ def GenerateStubs(output_file, source_file, includePaths = [], defaults="", scan
+                             log.WarnLine(self.oclass, "%s: integer size is not fixed, use a stdint type instead" % self.str_typename)
+                         return "Number<%s>" % noref
+                     elif isinstance(self.expanded_typename, CppParser.String):
+-                        return "Text"
++                        return "Text<uint32_t>"
+                     elif isinstance(self.expanded_typename, CppParser.Bool):
+                         return "Boolean"
+                     elif isinstance(self.expanded_typename, CppParser.Enum):
+-- 
+2.25.1
+
