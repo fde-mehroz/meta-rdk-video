@@ -112,6 +112,7 @@ do_install_append () {
         install -m 755 ${S}/tdkstop.sh ${D}${base_libdir}/rdk/
         install -m 755 ${S}/utilities/HWPerf_metric_parser.sh ${D}${TDK_TARGETDIR}/
         install -m 755 ${S}/utilities/HWPerf_metric_details.xml ${D}${TDK_TARGETDIR}/
+        install -m 755 ${S}/utilities/TDK_HWPerfTools_Executor.sh ${D}${TDK_TARGETDIR}/
     else
         install -d ${D}${base_libdir}/rdk/
         install -d ${D}${systemd_unitdir}/system
