@@ -12,6 +12,8 @@ SRCREV = "${AUTOREV}"
 SRC_URI = "${CMF_GIT_ROOT}/rdk/components/generic/sys_mon_tools/key_simulator;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH}"
 S = "${WORKDIR}/git"
 
+CFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'flex2_rdk', ' -D_SKQ_KEY_MAP_1_', '', d)}"
+
 DEPENDS = "iarmbus iarmmgrs dbus glib-2.0"
 RDEPENDS_${PN} += "iarmmgrs"
 inherit autotools pkgconfig coverity
