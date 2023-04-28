@@ -24,6 +24,8 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            file://0001-SERXIONE-600-LocationSync-Network-check-timer.patch \
            file://0001-RDKTV-20749-Revert-Merge-pull-request-3336-from-npol.patch \
            file://0001-RDK-39924-Launch-Airplay-App-from-Airplay-icon-sel.patch \
+           file://0001-RDK-41681-Update-TextToSpeech-Implementation.patch \
+           file://0001-RDK-41681-PR4013.patch \
           "
 
 # May 10, 2023

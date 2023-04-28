@@ -15,6 +15,7 @@ TEXTTOSPEECH_VOICE_FOR_IT ?= " "
 # ----------------------------------------------------------------------------
 
 PACKAGECONFIG[texttospeech] = "-DPLUGIN_TEXTTOSPEECH=ON \
+                               -DPLUGIN_MONITOR_TEXTTOSPEECH=ON \
                                -DPLUGIN_TEXTTOSPEECH_ENDPOINT="${TEXTTOSPEECH_ENDPOINT}" \
                                -DPLUGIN_TEXTTOSPEECH_SECURE_ENDPOINT="${TEXTTOSPEECH_SECURE_ENDPOINT}" \
                                -DPLUGIN_TEXTTOSPEECH_LANGUAGE="${TEXTTOSPEECH_LANGUAGE}" \
