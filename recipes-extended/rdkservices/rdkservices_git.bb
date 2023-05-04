@@ -24,18 +24,22 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            file://0001-SERXIONE-600-LocationSync-Network-check-timer.patch \
            file://0001-RDKTV-20749-Revert-Merge-pull-request-3336-from-npol.patch \
            file://0001-RDK-39924-Launch-Airplay-App-from-Airplay-icon-sel.patch \
+           file://0001-rdkservices_cbcs_changes.patch \
            file://0001-RDK-41681-Update-TextToSpeech-Implementation.patch \
            file://0001-RDK-41681-PR4013.patch \
-           file://0001-rdkservices_cbcs_changes.patch \
+           file://0002-Adding-Support-For-R4.patch \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://0003-Messenger_Plugin-Compilation-Fix-For-R4.patch', ' ', d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://R4.2_DeviceInfo_compilation_error.patch', ' ', d)} \
           "
 
-# June 02 2023
-SRCREV = "12ca7cc05ab6bc56b818c3fe601b6359008fd50a"
+# June 07 2023
+SRCREV = "1403b9f88b7a38d5d8762d02b31266145b4681ce"
 
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "-DCMAKE_SYSROOT=${STAGING_DIR_HOST}"
+EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' -DUSE_THUNDER_R4=ON', '', d)}"
 
-DEPENDS += "wpeframework-clientlibraries devicesettings iarmbus iarmmgrs tts storagemanager nopoll audiocapturemgr hdmicec ctrlm-headers"
+DEPENDS += "wpeframework-tools-native wpeframework-clientlibraries devicesettings iarmbus iarmmgrs tts storagemanager nopoll audiocapturemgr hdmicec ctrlm-headers"
 DEPENDS +=  " trower-base64 rfc telemetry websocketpp boost "
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluetooth-mgr', '', d)}"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell', ' rdkshell ', '', d)}"
@@ -84,6 +88,8 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'dlnasupport', ' dlna', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'flex2_rdk', ' hdmicecsource', ' ', d)} \
 "
+
+PACKAGECONFIG_remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' tracecontrol', '', d)}"
 
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell', ' -DPLUGIN_RDKSHELL=ON ', ' -DPLUGIN_RDKSHELL=OFF ', d)}"
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell_disable_autostart', ' -DPLUGIN_RDKSHELL_AUTOSTART=false ', ' -DPLUGIN_RDKSHELL_AUTOSTART=true ', d)}"

@@ -1,24 +1,28 @@
 SUMMARY = "WPEFramework interfaces"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=f1dffbfd5c2eb52e0302eb6296cc3711"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=2f6c18f99faffa0e5d4ff478705c53f8"
 PR = "r0"
 
 require include/thunder.inc
 DEPENDS = "wpeframework wpeframework-tools-native"
 
-SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch=R2;name=wpeframework-interfaces \
-           file://0018-notifyclient-event-added.patch \
-           file://0020-Adding-the-VoiceCommand-API-for-Netflix-plugin.patch \
-           file://0001-Add-IFocus-iface.patch \
-           file://0001-Revert-Merge-pull-request-137-from-mikolaj-staworzyn.patch \
-           file://0001-Extend-web-browser-interface-for-XRE-usecases.patch \
-           file://0001-RDK-37042-Add-interfaces-for-Airplay-Plugin.patch \
-           file://0001-RDK-40478-Run-AirplayDaemon-as-thunder-plugin.patch \
-           file://0001-Add-TextToSpeech-Interface.patch \
+SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch=R4;name=wpeframework-interfaces \
+           file://r4/Library-version-Matched-With-Release-interfaces.patch \
+           file://r4/SplitDeviceCapablities.patch \
+           file://r4/0018-notifyclient-event-added.patch \
+           file://r4/0020-Adding-the-VoiceCommand-API-for-Netflix-plugin.patch \
+           file://r4/0001-Revert-Merge-pull-request-137-from-mikolaj-staworzyn.patch \
+           file://r4/0001-Add-TextToSpeech-Interface.patch \
+           file://r4/0001-RDK-37042-Add-interfaces-for-Airplay-Plugin.patch \
+           file://r4/0001-RDK-40478-Run-AirplayDaemon-as-thunder-plugin.patch \
+           file://r4/0001-OCDM-Adapter-Implementation.patch \
+           file://r4/Inetflix-api-revert.patch \
+           file://r4/0101-IWatermark-Interface-In-R4.patch \
            "
 
+#
 # Sep 29, 2022
-SRCREV_wpeframework-interfaces = "7547343f51e92ffd897e44f38d710336601135da"
+SRCREV_wpeframework-interfaces = "${THUNDER_RELEASE_TAG_NAME}"
 
 # ----------------------------------------------------------------------------
 

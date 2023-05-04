@@ -105,7 +105,8 @@ CXXFLAGS_append  = " ${@bb.utils.contains('IRDB_DISCOVERY', 'CEC', ' -DIRDB_CEC_
 # Thunder Dependency
 THUNDER           ??= "false"
 CXXFLAGS_append     = "${@bb.utils.contains('THUNDER', 'true', ' -I=${includedir}/WPEFramework/ -I=${includedir}/WPEFramework/core/', '', d)}"
-LDFLAGS_append      = "${@bb.utils.contains('THUNDER', 'true', ' -lWPEFrameworkCore -lWPEFrameworkProtocols -lWPEFrameworkPlugins -lWPEFrameworkTracing', '', d)}"
+LDFLAGS_append      = "${@bb.utils.contains('THUNDER', 'true', ' -lWPEFrameworkCore -lWPEFrameworkPlugins', '', d)}"
+LDFLAGS_append      = "${@bb.utils.contains('THUNDER', 'true', bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', " -lWPEFrameworkCOM -lWPEFrameworkWebSocket ", " -lWPEFrameworkProtocols -lWPEFrameworkTracing", d), " ", d)}"
 DEPENDS_append      = "${@bb.utils.contains('THUNDER', 'true', ' wpeframework', '', d)}"
 EXTRA_OECONF_append = "${@bb.utils.contains('THUNDER', 'true', ' --enable-thunder', '', d)}"
 

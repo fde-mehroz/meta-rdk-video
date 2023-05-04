@@ -14,7 +14,7 @@ S = "${WORKDIR}/git/plugin"
 
 inherit cmake pkgconfig
 
-DEPENDS = "wpeframework"
+DEPENDS = "wpeframework wpeframework-tools-native"
 
 COBALT_PERSISTENTPATHPOSTFIX ?= "Cobalt-0"
 COBALT_CLIENTIDENTIFIER ?= "wst-Cobalt-0"

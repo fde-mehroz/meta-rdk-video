@@ -11,7 +11,7 @@ diff --git a/Source/cryptography/implementation/SecApi/VaultNetflix.cpp b/Source
 index 173d64d..2d2a340 100644
 --- a/Source/cryptography/implementation/SecApi/VaultNetflix.cpp
 +++ b/Source/cryptography/implementation/SecApi/VaultNetflix.cpp
-@@ -38,14 +38,28 @@ namespace Implementation {
+@@ -38,14 +38,30 @@ namespace Implementation {
              std::string path;
              WPEFramework::Core::SystemInfo::GetEnvironment(_T("NETFLIX_VAULT"), path);
              WPEFramework::Core::File file(path.c_str(), true);
@@ -40,7 +40,9 @@ index 173d64d..2d2a340 100644
 +            }
 +            bool result = netflix.loadBoundKeys(buf, inSize);
 +            if (buf != NULL)
-+               {free(buf)};
++            {
++                free(buf);
++            }
 +            ASSERT(result == true);
          };
 

@@ -1,28 +1,30 @@
 SUMMARY = "WPEFramework client libraries"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=f1dffbfd5c2eb52e0302eb6296cc3711"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=847677038847363222ffb66cfa6406c2"
 PR = "r0"
 
 require include/thunder.inc
 
-SRC_URI = "git://github.com/rdkcentral/ThunderClientLibraries.git;protocol=git;branch=R2;name=wpeframework-clientlibraries \
-           file://0001-RDK-28534-Security-Agent-Utility-and-Logging-ClientLibs.patch \
-           file://0021-move-the-SOC-specific-svp-transformation-to-gst-svp.patch \
-           file://0001-link-secapi-crypto.patch \
-           file://0026-Send_empty_buffer_on_noBoundKeyMsg.patch \
-           file://0002-openssl-api-based-on-openssl-version.patch \
-           file://0001-IPersistent_API_Cobalt.patch \
-           file://0001-SecurityUtilityApp-input-args-support.patch \
-           file://0001-OCDM-enhancement-for-BCOM-ocdm-adapter.patch \
+SRC_URI = "git://github.com/rdkcentral/ThunderClientLibraries.git;protocol=git;branch=R4;name=wpeframework-clientlibraries \
+           file://r4/0001-RDK-28534-Security-Agent-Utility-and-Logging-ClientLibs.patch \
            file://0001-OCDM-enhancement-for-rdk-ocdm-adapter.patch \
+           file://r4/Library-version-Matched-With-Release-ClientLibs.patch \
+           file://r4/0004-Cipher-CipherNetflix-methods-return-type-changes.patch \
+           file://r4/R4.1_compilation_error_fix_temp.patch \
+           file://r4/0003_MediaType_name_changed.patch \
+           file://r4/0004-R4-Security-Agent-Library-NameChange.patch \
+           file://0001-link-secapi-crypto.patch \
+           file://r4/R4.1_Trace_enabled_error_wpeframework_clientlibraries.patch \
+           file://r4/0001-OCDM-enhancement-for-ocdm-adapter.patch \
            "
 
 # Sep 29, 2022
-SRCREV_wpeframework-clientlibraries = "adf82a27efed27ab7bc4208b6f9579f2dcc86a71"
+SRCREV_wpeframework-clientlibraries = "${THUNDER_RELEASE_TAG_NAME}"
 
 # ----------------------------------------------------------------------------
 
-include include/compositor.inc
+require recipes-extended/rdkservices/include/compositor.inc
+#include include/compositor.inc
 
 DEPENDS = " \
     wpeframework-interfaces \

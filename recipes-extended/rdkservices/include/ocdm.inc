@@ -2,7 +2,7 @@
 
 PACKAGECONFIG[opencdmi]       = "-DPLUGIN_OPENCDMI=ON \
                                  -DPLUGIN_OPENCDMI_AUTOSTART=true \
-                                 -DPLUGIN_OPENCDMI_OOP=true \
+                                 -DPLUGIN_OPENCDMI_MODE=Local \
                                 ,,"
 PACKAGECONFIG[opencdmi_ck]    = "-DPLUGIN_OPENCDMI_CLEARKEY=ON,,,wpeframework-ocdm-clearkey"
 PACKAGECONFIG[opencdmi_pr]    = "-DPLUGIN_OPENCDMI_PLAYREADY=ON,,,wpeframework-ocdm-playready"

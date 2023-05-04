@@ -1,5 +1,6 @@
 From d44e9bc784013a30a8dbaf3b0d3006f0572be555 Mon Sep 17 00:00:00 2001
 From: kkanag314 <krishnapriya_kanagaraj@comcast.com>
+From: Karunakaran A <Karunakaran_Amirthalingam@cable.comcast.com>
 Date: Wed, 21 Dec 2022 17:24:43 +0000
 Subject: [PATCH] rdkservice changes
 
@@ -18,10 +19,10 @@ Subject: [PATCH] rdkservice changes
  delete mode 100644 OpenCDMi/CapsParser.h
  create mode 100644 OpenCDMi/Protobuf.h
 
-diff --git a/OpenCDMi/CENCParser.h b/OpenCDMi/CENCParser.h
-index 58b5eb54..76827ec5 100644
---- a/OpenCDMi/CENCParser.h
-+++ b/OpenCDMi/CENCParser.h
+Index: git/OpenCDMi/CENCParser.h
+===================================================================
+--- git.orig/OpenCDMi/CENCParser.h
++++ git/OpenCDMi/CENCParser.h
 @@ -21,6 +21,7 @@
  #define __CENCPARSER_H
  
@@ -281,8 +282,7 @@ index 58b5eb54..76827ec5 100644
 -                    TRACE(Trace::Information, (_T("PlayReady BIN detected [%d]\n"), __LINE__));
 -                    system = PLAYREADY;
 -                    psshData += 4;
-+                    TRACE(Trace::Error, (_T("Invalid PSSH data")));
-                 }
+-                }
 -            } else if (::memcmp(&(data[4]), WideVine, KeyId::Length()) == 0) {
 -                TRACE(Trace::Information, (_T("WideVine detected [%d]\n"), __LINE__));
 -                system = WIDEVINE;
@@ -291,6 +291,8 @@ index 58b5eb54..76827ec5 100644
 -                TRACE(Trace::Information, (_T("ClearKey detected [%d]\n"), __LINE__));
 -                system = CLEARKEY;
 -                psshData += 4;
++                    TRACE(Trace::Error, (_T("Invalid PSSH data")));
++                }
              } else {
 -                TRACE(Trace::Information, (_T("Unknown system: %02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X.\n"), data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]));
 -                count = 0;
@@ -419,11 +421,11 @@ index 58b5eb54..76827ec5 100644
  
      private:
          std::list<KeyId> _keyIds;
-diff --git a/OpenCDMi/CMakeLists.txt b/OpenCDMi/CMakeLists.txt
-index e83612c1..19880056 100644
---- a/OpenCDMi/CMakeLists.txt
-+++ b/OpenCDMi/CMakeLists.txt
-@@ -24,8 +24,9 @@ set(PLUGIN_OPENCDMI_MODE "Local" CACHE STRING "Controls if the plugin should run
+Index: git/OpenCDMi/CMakeLists.txt
+===================================================================
+--- git.orig/OpenCDMi/CMakeLists.txt
++++ git/OpenCDMi/CMakeLists.txt
+@@ -24,8 +24,9 @@ set(PLUGIN_OPENCDMI_MODE "Local" CACHE S
  set(PLUGIN_OCDM_STARTUPORDER "" CACHE STRING "To configure startup order of OCDM plugin")
  
  # deprecated/legacy flags support
@@ -443,10 +445,9 @@ index e83612c1..19880056 100644
          Module.cpp)
  
  add_dependencies(${MODULE_NAME} ${PLUGIN_OCDM_IMPLEMENTATION})
-diff --git a/OpenCDMi/CapsParser.cpp b/OpenCDMi/CapsParser.cpp
-deleted file mode 100644
-index 1d6a7ad4..00000000
---- a/OpenCDMi/CapsParser.cpp
+Index: git/OpenCDMi/CapsParser.cpp
+===================================================================
+--- git.orig/OpenCDMi/CapsParser.cpp
 +++ /dev/null
 @@ -1,204 +0,0 @@
 -/*
@@ -653,10 +654,9 @@ index 1d6a7ad4..00000000
 -        }
 -    }
 -}
-diff --git a/OpenCDMi/CapsParser.h b/OpenCDMi/CapsParser.h
-deleted file mode 100644
-index 9ad148dc..00000000
---- a/OpenCDMi/CapsParser.h
+Index: git/OpenCDMi/CapsParser.h
+===================================================================
+--- git.orig/OpenCDMi/CapsParser.h
 +++ /dev/null
 @@ -1,63 +0,0 @@
 -/*
@@ -722,10 +722,10 @@ index 9ad148dc..00000000
 -        };
 -    }
 -}
-diff --git a/OpenCDMi/FrameworkRPC.cpp b/OpenCDMi/FrameworkRPC.cpp
-index 6fafd4b2..b95173a3 100644
---- a/OpenCDMi/FrameworkRPC.cpp
-+++ b/OpenCDMi/FrameworkRPC.cpp
+Index: git/OpenCDMi/FrameworkRPC.cpp
+===================================================================
+--- git.orig/OpenCDMi/FrameworkRPC.cpp
++++ git/OpenCDMi/FrameworkRPC.cpp
 @@ -23,7 +23,6 @@
  
  #include "Module.h"
@@ -859,11 +859,10 @@ index 6fafd4b2..b95173a3 100644
                              if (IsRunning() == true) {
 -                                uint8_t keyIdLength = 0;
 -                                const uint8_t* keyIdData = KeyId(keyIdLength);
--
++                                uint8_t *payloadBuffer = Buffer();
+ 
 -                                _parser->Parse(StreamInfo(), StreamInfoLength());
 -                                _mediaKeys->SetCapsParser(_parser);
-+                                uint8_t *payloadBuffer = Buffer();
-+
 +                                CDMi::SampleInfo sampleInfo;
 +                                sampleInfo.scheme = static_cast<CDMi::EncryptionScheme>(EncScheme());
 +                                EncPattern(sampleInfo.pattern.encrypted_blocks,sampleInfo.pattern.clear_blocks);
@@ -893,7 +892,6 @@ index 6fafd4b2..b95173a3 100644
 -                                    keyIdData,
 -                                    InitWithLast15());
 -
--                                if ((cr == 0) && (clearContentSize != 0)) {
 +                                        payloadBuffer,
 +                                        BytesWritten(),
 +                                        &clearContent,
@@ -901,7 +899,7 @@ index 6fafd4b2..b95173a3 100644
 +                                        const_cast<CDMi::SampleInfo *>(&sampleInfo),
 +                                        dynamic_cast<const CDMi::IStreamProperties *>(&streamProperties));
 +                                
-+                                if ((cr == 0) && (clearContentSize != 0)) {
+                                 if ((cr == 0) && (clearContentSize != 0)) {
                                      if (clearContentSize != BytesWritten()) {
                                          TRACE(Trace::Information, (_T("Returned clear sample size (%d) differs from encrypted buffer size (%d)"), clearContentSize, BytesWritten()));
                                          Size(clearContentSize);
@@ -1092,7 +1090,7 @@ index 6fafd4b2..b95173a3 100644
 +                            ASSERT(_buffer != nullptr);
 +
 +                            if(_buffer->IsValid() == false){
-+                                SYSLOG(Trace::Fatal, ("Could not open session buffer %s", BufferId().c_str()));
++                                TRACE(Trace::Fatal, ("Could not open session buffer %s", BufferId().c_str()));
 +                            }
 +
 +
@@ -1589,13 +1587,13 @@ index 6fafd4b2..b95173a3 100644
 -            // On activation subscribe, on deactivation un-subscribe
 -            PluginHost::ISubSystem* subSystem = service->SubSystems();
 +            _shell = service;
-+
+ 
 +            _shell->AddRef();
 +            _thread.Start();
 +
 +            return (result);
 +        }
- 
++
 +        uint32_t InitializeAsync()
 +        {
 +            uint32_t result = Core::ERROR_NONE;
@@ -1614,16 +1612,14 @@ index 6fafd4b2..b95173a3 100644
  
              // Before we start loading the mapping of the Keys to the factories, load the factories :-)
              Core::Directory entry(locator.c_str(), _T("*.drm"));
-@@ -1155,7 +1242,8 @@ namespace Plugin {
+@@ -1155,6 +1242,7 @@ namespace Plugin {
                      }
                  } else {
                      SYSLOG(Logging::Startup, (_T("Could not load factory [%s], error [%s]"), Core::File::FileNameExtended(entry.Current()).c_str(), library.Error().c_str()));
--                }
 +                    result = Core::ERROR_OPENING_FAILED;
-+                }
+                 }
              }
  
-             Core::JSON::ArrayType<Config::Systems>::ConstIterator index(static_cast<const Config&>(config).KeySystems.Elements());
 @@ -1178,6 +1266,7 @@ namespace Plugin {
  
                              } else {
@@ -1712,10 +1708,10 @@ index 6fafd4b2..b95173a3 100644
      };
  
      SERVICE_REGISTRATION(OCDMImplementation, 1, 0);
-diff --git a/OpenCDMi/OCDM.config b/OpenCDMi/OCDM.config
-index e7295c4b..659ca69a 100644
---- a/OpenCDMi/OCDM.config
-+++ b/OpenCDMi/OCDM.config
+Index: git/OpenCDMi/OCDM.config
+===================================================================
+--- git.orig/OpenCDMi/OCDM.config
++++ git/OpenCDMi/OCDM.config
 @@ -37,28 +37,31 @@ map()
      kv(designators "___array___;org.chromium.externalclearkey;org.w3.clearkey")
  end()
@@ -1800,11 +1796,11 @@ index e7295c4b..659ca69a 100644
  endif()
  
  map_append(${configuration} root ${rootobject})
-diff --git a/OpenCDMi/OCDM.cpp b/OpenCDMi/OCDM.cpp
-index e365e9b6..a1c0900a 100644
---- a/OpenCDMi/OCDM.cpp
-+++ b/OpenCDMi/OCDM.cpp
-@@ -45,38 +45,35 @@ namespace OCDM {
+Index: git/OpenCDMi/OCDM.cpp
+===================================================================
+--- git.orig/OpenCDMi/OCDM.cpp
++++ git/OpenCDMi/OCDM.cpp
+@@ -45,41 +45,38 @@ namespace OCDM {
      Exchange::IMemory* MemoryObserver(const RPC::IRemoteConnection* connection)
      {
          class MemoryObserverImpl : public Exchange::IMemory {
@@ -1848,12 +1844,17 @@ index e365e9b6..a1c0900a 100644
              {
                  return (IsOperational() ? 1 : 0);
              }
+-#ifndef USE_THUNDER_R4
+-            virtual bool IsOperational() const
++#ifdef USE_THUNDER_R4
++            virtual bool IsOperational() const override
+ #else
 -            virtual const bool IsOperational() const
 +            const bool IsOperational() const override
+ #endif /* USE_THUNDER_R4 */
              {
                  return _main.IsActive();
-             }
-@@ -110,25 +107,26 @@ namespace Plugin {
+@@ -114,25 +111,26 @@ namespace Plugin {
  
          string message;
  
@@ -1884,7 +1885,7 @@ index e365e9b6..a1c0900a 100644
              _opencdmi->Initialize(_service);
  
              ASSERT(_connectionId != 0);
-@@ -143,56 +141,75 @@ namespace Plugin {
+@@ -147,56 +145,75 @@ namespace Plugin {
              }
              else {
                  message = _T("OCDM crashed at initialize!");
@@ -1984,10 +1985,10 @@ index e365e9b6..a1c0900a 100644
      {
      }
  
-diff --git a/OpenCDMi/OCDM.h b/OpenCDMi/OCDM.h
-index cbefe353..4aabead0 100644
---- a/OpenCDMi/OCDM.h
-+++ b/OpenCDMi/OCDM.h
+Index: git/OpenCDMi/OCDM.h
+===================================================================
+--- git.orig/OpenCDMi/OCDM.h
++++ git/OpenCDMi/OCDM.h
 @@ -30,25 +30,20 @@ namespace Plugin {
  
      class OCDM : public PluginHost::IPlugin, public PluginHost::IWeb, public PluginHost::JSONRPC {
@@ -2016,7 +2017,7 @@ index cbefe353..4aabead0 100644
  
          public:
              virtual void Activated(RPC::IRemoteConnection*)
-@@ -69,25 +64,23 @@ namespace Plugin {
+@@ -69,10 +64,6 @@ namespace Plugin {
  
      public:
          class Data : public Core::JSON::Container {
@@ -2024,11 +2025,10 @@ index cbefe353..4aabead0 100644
 -            Data(const Data&) = delete;
 -            Data& operator=(const Data&) = delete;
 -
--        public:
-+        public:
+         public:
              class System : public Core::JSON::Container {
              private:
-                 System& operator=(const System&) = delete;
+@@ -80,14 +71,16 @@ namespace Plugin {
  
              public:
                  System()
@@ -2066,7 +2066,7 @@ index cbefe353..4aabead0 100644
  
              public:
                  Core::JSON::String Name;
-@@ -126,38 +118,32 @@ namespace Plugin {
+@@ -126,39 +118,33 @@ namespace Plugin {
              };
  
          public:
@@ -2108,13 +2108,13 @@ index cbefe353..4aabead0 100644
 -        virtual ~OCDM()
 -        {
 -            UnregisterAll();
--        }
-+        }
-+
-+        ~OCDM() override = default;
+         }
  
++        ~OCDM() override = default;
++
      public:
          BEGIN_INTERFACE_MAP(OCDM)
+         INTERFACE_ENTRY(PluginHost::IPlugin)
 @@ -178,22 +164,22 @@ namespace Plugin {
          // If there is an error, return a string describing the issue why the initialisation failed.
          // The Service object is *NOT* reference counted, lifetime ends if the plugin is deactivated.
