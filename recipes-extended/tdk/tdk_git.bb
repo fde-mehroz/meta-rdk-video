@@ -28,6 +28,7 @@ EXTRA_OECONF += " --enable-westeroshal"
 DEPENDS += "iarmbus devicesettings rdk-logger jsoncpp jsonrpc westeros aamp"
 DEPENDS_append_client = " iarmmgrs servicemanager netsrvmgr moca-hal"
 DEPENDS_append_hybrid = " iarmmgrs servicemanager xupnp virtual/dtcpmgr"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES','tdk_benchmark','libxml2', '',d)}"
 
 RDEPENDS_${PN} += " jsoncpp jsonrpc bash "
 RDEPENDS_${PN}_dunfell  += " jsoncpp jsonrpc bash devicesettings"
