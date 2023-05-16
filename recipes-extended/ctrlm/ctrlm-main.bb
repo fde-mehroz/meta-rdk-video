@@ -103,7 +103,7 @@ CXXFLAGS_append  = " ${@bb.utils.contains('IRDB_DISCOVERY', 'HDMI', ' -DIRDB_HDM
 CXXFLAGS_append  = " ${@bb.utils.contains('IRDB_DISCOVERY', 'CEC', ' -DIRDB_CEC_DISCOVERY', '', d)}"
 
 # Thunder Dependency
-THUNDER            ?= "false"
+THUNDER           ??= "false"
 CXXFLAGS_append     = "${@bb.utils.contains('THUNDER', 'true', ' -I=${includedir}/WPEFramework/ -I=${includedir}/WPEFramework/core/', '', d)}"
 LDFLAGS_append      = "${@bb.utils.contains('THUNDER', 'true', ' -lWPEFrameworkCore -lWPEFrameworkProtocols -lWPEFrameworkPlugins -lWPEFrameworkTracing', '', d)}"
 DEPENDS_append      = "${@bb.utils.contains('THUNDER', 'true', ' wpeframework', '', d)}"
@@ -148,7 +148,6 @@ EXTRA_OECONF_append = "${@bb.utils.contains('ASB', 'true', ' --enable-asb', '', 
 
 # Authorization Support
 AUTH             ??= "false"
-AUTH_THUNDER     ??= "false"
 AUTH_RECEIVER_ID ??= "false"
 AUTH_DEVICE_ID   ??= "false"
 AUTH_ACCOUNT_ID  ??= "false"
@@ -174,14 +173,6 @@ EXTRA_OECONF_append = "${@bb.utils.contains('VOICE_NEXTGEN_MAC', 'true', ' --ena
 
 VOICE_KEYWORD_BEEP ??= "false"
 EXTRA_OECONF_append = "${@bb.utils.contains('VOICE_KEYWORD_BEEP', 'true', ' --enable-voice-keyword-beep', '', d)}"
-
-# Enable Thunder IF using UEI irdb or Voice Keyword Beep or Auth via Thunder
-python() {
-    if 'ctrlm_irdb_uei' in d.getVar('DISTRO_FEATURES', False) or d.getVar('VOICE_KEYWORD_BEEP', False) == 'true' or d.getVar('AUTH_THUNDER', False) == 'true':
-        d.setVar('THUNDER', 'true')
-    else:
-        d.setVar('THUNDER', 'false')
-}
 
 XLOG_MODULE_NAME="CTRLM"
 LOGGER:="${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_voice_sdk', 'rdkx-logger', '', d)}"

@@ -56,13 +56,6 @@ do_install() {
     install -m 644 ${S}/src/irdb/ipc/ctrlm_irdb_ipc.h ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/irdb/ipc/ctrlm_irdb_ipc_iarm_thunder.h ${D}${includedir}/ctrlm_private
     
-    install -m 644 ${S}/src/thunder/plugins/ctrlm_thunder_plugin_display_settings.h ${D}${includedir}/ctrlm_private
-    install -m 644 ${S}/src/thunder/plugins/ctrlm_thunder_plugin_hdmi_input.h ${D}${includedir}/ctrlm_private
-    install -m 644 ${S}/src/thunder/plugins/ctrlm_thunder_plugin_cec.h ${D}${includedir}/ctrlm_private
-    install -m 644 ${S}/src/thunder/plugins/ctrlm_thunder_plugin_cec_common.h ${D}${includedir}/ctrlm_private
-    install -m 644 ${S}/src/thunder/plugins/ctrlm_thunder_plugin_cec_source.h ${D}${includedir}/ctrlm_private
-    install -m 644 ${S}/src/thunder/plugins/ctrlm_thunder_plugin_cec_sink.h ${D}${includedir}/ctrlm_private
-    
     # Network Support
     install -m 644 ${S}/src/ctrlm.h ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/ctrlm_rcu.h ${D}${includedir}/ctrlm_private
