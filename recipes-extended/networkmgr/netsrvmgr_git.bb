@@ -25,6 +25,8 @@ SYSLOG-NG_LOGRATE_netsrvmgr = "high"
 
 #define connectivity endpoints
 CONNECTIVITY_ENDPOINT_1= "http://clients3.google.com/generate_204"
+CONNECTIVITY_ENDPOINT_2= "http://gstatic.com/generate_204"
+CONNECTIVITY_ENDPOINT_3= "http://edge-http.microsoft.com/captiveportal/generate_204"
 
 CXXFLAGS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', ' `pkg-config --cflags libsafec`', ' -fPIC', d)}"
 CXXFLAGS_append_client = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', ' `pkg-config --cflags libsafec`', ' -fPIC', d)}"
@@ -75,7 +77,12 @@ do_install_append() {
         install -d ${D}${systemd_unitdir}/system
 
         sed -i '/CONNECTIVITY_ENDPOINT_1/c CONNECTIVITY_ENDPOINT_1=${CONNECTIVITY_ENDPOINT_1}' ${S}/conf/netsrvmgr.conf
+        sed -i '/CONNECTIVITY_ENDPOINT_2/c CONNECTIVITY_ENDPOINT_2=${CONNECTIVITY_ENDPOINT_2}' ${S}/conf/netsrvmgr.conf
+        sed -i '/CONNECTIVITY_ENDPOINT_3/c CONNECTIVITY_ENDPOINT_3=${CONNECTIVITY_ENDPOINT_3}' ${S}/conf/netsrvmgr.conf
+
         sed -i '/CONNECTIVITY_ENDPOINT_1/c CONNECTIVITY_ENDPOINT_1=${CONNECTIVITY_ENDPOINT_1}' ${S}/conf/netsrvmgr.conf.tv
+        sed -i '/CONNECTIVITY_ENDPOINT_2/c CONNECTIVITY_ENDPOINT_2=${CONNECTIVITY_ENDPOINT_2}' ${S}/conf/netsrvmgr.conf.tv
+        sed -i '/CONNECTIVITY_ENDPOINT_3/c CONNECTIVITY_ENDPOINT_3=${CONNECTIVITY_ENDPOINT_3}' ${S}/conf/netsrvmgr.conf.tv
 
         install -m 0644 ${S}/conf/netsrvmgr.conf ${D}${sysconfdir}
         install -m 0644 ${S}/conf/netsrvmgr_Telemetry_LoggingParams.json ${D}${sysconfdir}
