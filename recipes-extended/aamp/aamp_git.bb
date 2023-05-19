@@ -1,7 +1,7 @@
 SUMMARY = "RDK AAMP component"
 SECTION = "console/utils"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=175792518e4ac015ab6696d16c4f607e"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=97dd37dbf35103376811825b038fc32b"
 
 PV = "${RDK_RELEASE}"
 SRCREV_aamp = "${AUTOREV}"
@@ -13,7 +13,7 @@ RDEPENDS_${PN} += "gst-plugins-rdk-aamp devicesettings"
 
 NO_RECOMMENDATIONS = "1"
 
-AAMP_RELEASE_TAG_NAME ?= "5.4.4.0"
+AAMP_RELEASE_TAG_NAME ?= "5.5.1.0"
 
 SRC_URI = "${CMF_GIT_ROOT}/rdk/components/generic/aamp;protocol=${CMF_GIT_PROTOCOL};branch=${AAMP_RELEASE_TAG_NAME};nobranch=1;name=aamp"
 SRC_URI += "${@bb.utils.contains('AAMP_RELEASE_TAG_NAME', 'dev_sprint_22_1', 'file://0001-Updated-Find-JSC-include-path.patch', 'file://0001-Find-JSC-include-path.patch', d)}"
