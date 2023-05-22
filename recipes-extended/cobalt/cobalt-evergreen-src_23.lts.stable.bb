@@ -1,7 +1,7 @@
 SUMMARY = "Build Evergreen Cobalt Core library from source code. Use for debug and development puroposes."
 HOMEPAGE = "https://cobalt.googlesource.com/"
 
-LICENSE = "BSD-3-Clause & Apache-2.0"
+LICENSE = "BSD-3-Clause & Apache-2.0-with-LLVM-exception"
 LIC_FILES_CHKSUM = " \
     file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d \
 "
