@@ -35,20 +35,12 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
 SRCREV = "699ddfeb213be077fd957eb568053c40927a36fd"
 
 TOOLCHAIN = "gcc"
-EXTRA_OECMAKE += "-DCMAKE_SYSROOT=${STAGING_DIR_HOST}"
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' -DUSE_THUNDER_R4=ON', '', d)}"
 
-DEPENDS += "wpeframework-tools-native wpeframework-clientlibraries devicesettings iarmbus iarmmgrs tts storagemanager nopoll audiocapturemgr hdmicec ctrlm-headers"
-DEPENDS +=  " trower-base64 rfc telemetry websocketpp boost "
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluetooth-mgr', '', d)}"
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell', ' rdkshell ', '', d)}"
-DEPENDS += " breakpad-wrapper"
-DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'systimemgr',     'systimemgrinetrface', '', d)}"
+DEPENDS += "wpeframework wpeframework-tools-native"
+RDEPENDS_${PN} += "wpeframework"
 
 TARGET_LDFLAGS += " -Wl,--no-as-needed -ltelemetry_msgsender -Wl,--as-needed "
-EXTRA_OECMAKE += "-DBUILD_ENABLE_TELEMETRY_LOGGING=ON"
-
-RDEPENDS_${PN} += "devicesettings"
 
 CXXFLAGS += " -I${STAGING_DIR_TARGET}${includedir}/wdmp-c/ "
 CXXFLAGS += " -I${STAGING_DIR_TARGET}${includedir}/trower-base64/ "
@@ -68,11 +60,15 @@ include include/texttospeech.inc
 
 WPEFRAMEWORK_LOCATIONSYNC_URI ?= "http://jsonip.metrological.com/?target=wpe"
 
+# ----------------------------------------------------------------------------
+
 PACKAGECONFIG ?= " \
+    breakpadsupport \
+    telemetrysupport \
     ${WPE_SNAPSHOT} \
-    activitymonitor avinput continuewatching controlservice voicecontrol remotecontrol datacapture devicediagnostics \
+    activitymonitor avinput continuewatching datacapture devicediagnostics \
     displaysettings framerate hdcpprofile hdmicec hdmiinput loggingpreferences \
-    messenger remoteactionmapping screencapture securityagent stateobserver \
+    messenger screencapture securityagent stateobserver \
     systemservices timer userpreferences warehouse monitor locationsync texttospeech persistent_store airplayservice \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluetoothcontrol', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'opencdm',              'opencdmi', '', d)} \
@@ -87,62 +83,72 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'dlnasupport', ' dlna', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'flex2_rdk', ' hdmicecsource', ' ', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'messagecontrol', 'tracecontrol', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systimemgr', 'systimemgrsupport', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm', 'controlservice voicecontrol remotecontrol remoteactionmapping', '', d)} \
 "
 
 PACKAGECONFIG_remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' tracecontrol', '', d)}"
 
-EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell', ' -DPLUGIN_RDKSHELL=ON ', ' -DPLUGIN_RDKSHELL=OFF ', d)}"
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell_disable_autostart', ' -DPLUGIN_RDKSHELL_AUTOSTART=false ', ' -DPLUGIN_RDKSHELL_AUTOSTART=true ', d)}"
 EXTRA_OECMAKE += "${@bb.utils.contains_any('DISTRO_FEATURES', 'rdkshell_ra second_form_factor', ' -DPLUGIN_RDKSHELL_AUTOSTART=true ', ' ', d)}"
 
 EXTRA_OECMAKE += "-DDISABLE_GEOGRAPHY_TIMEZONE=ON"
 
+PACKAGECONFIG[breakpadsupport]      = ",,breakpad-wrapper,breakpad-wrapper"
+PACKAGECONFIG[telemetrysupport]     = "-DBUILD_ENABLE_TELEMETRY_LOGGING=ON,,telemetry,telemetry"
 PACKAGECONFIG[activitymonitor]      = "-DPLUGIN_ACTIVITYMONITOR=ON,-DPLUGIN_ACTIVITYMONITOR=OFF,"
-PACKAGECONFIG[avinput]              = "-DPLUGIN_AVINPUT=ON,-DPLUGIN_AVINPUT=OFF,"
-PACKAGECONFIG[bluetoothcontrol]     = "-DPLUGIN_BLUETOOTH=ON -DPLUGIN_BLUETOOTH_AUTOSTART=true,-DPLUGIN_BLUETOOTH=OFF,,bluez5"
-PACKAGECONFIG[continuewatching]     = "-DPLUGIN_CONTINUEWATCHING=ON,-DPLUGIN_CONTINUEWATCHING=OFF,"
-PACKAGECONFIG[controlservice]       = "-DPLUGIN_CONTROLSERVICE=ON,-DPLUGIN_CONTROLSERVICE=OFF,"
-PACKAGECONFIG[voicecontrol]         = "-DPLUGIN_VOICECONTROL=ON,-DPLUGIN_VOICECONTROL=OFF,"
-PACKAGECONFIG[remotecontrol]        = "-DPLUGIN_REMOTECONTROL=ON,-DPLUGIN_REMOTECONTROL=OFF,"
-PACKAGECONFIG[datacapture]          = "-DPLUGIN_DATACAPTURE=ON, -DPLUGIN_DATACAPTURE=OFF,"
-PACKAGECONFIG[devicediagnostics]    = "-DPLUGIN_DEVICEDIAGNOSTICS=ON,-DPLUGIN_DEVICEDIAGNOSTICS=OFF,"
-PACKAGECONFIG[deviceinfo]           = "-DPLUGIN_DEVICEINFO=ON,-DPLUGIN_DEVICEINFO=OFF,"
-PACKAGECONFIG[deviceidentification] = "-DPLUGIN_DEVICEIDENTIFICATION=ON,-DPLUGIN_DEVICEIDENTIFICATION=OFF,"
+PACKAGECONFIG[avinput]              = "-DPLUGIN_AVINPUT=ON,-DPLUGIN_AVINPUT=OFF,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
+PACKAGECONFIG[bluetoothcontrol]     = "-DPLUGIN_BLUETOOTH=ON -DPLUGIN_BLUETOOTH_AUTOSTART=true,-DPLUGIN_BLUETOOTH=OFF,iarmbus iarmmgrs bluetooth-mgr,bluez5 iarmbus bluetooth-mgr"
+PACKAGECONFIG[continuewatching]     = "-DPLUGIN_CONTINUEWATCHING=ON,-DPLUGIN_CONTINUEWATCHING=OFF,rfc trower-base64 openssl,rfc trower-base64 openssl"
+PACKAGECONFIG[controlservice]       = "-DPLUGIN_CONTROLSERVICE=ON,-DPLUGIN_CONTROLSERVICE=OFF,iarmbus iarmmgrs ctrlm-headers,iarmbus ctrlm"
+PACKAGECONFIG[voicecontrol]         = "-DPLUGIN_VOICECONTROL=ON,-DPLUGIN_VOICECONTROL=OFF,iarmbus iarmmgrs ctrlm-headers,iarmbus ctrlm"
+PACKAGECONFIG[remotecontrol]        = "-DPLUGIN_REMOTECONTROL=ON,-DPLUGIN_REMOTECONTROL=OFF,iarmbus iarmmgrs ctrlm-headers,iarmbus ctrlm"
+PACKAGECONFIG[datacapture]          = "-DPLUGIN_DATACAPTURE=ON, -DPLUGIN_DATACAPTURE=OFF,iarmbus iarmmgrs audiocapturemgr curl,iarmbus audiocapturemgr curl"
+PACKAGECONFIG[devicediagnostics]    = "-DPLUGIN_DEVICEDIAGNOSTICS=ON,-DPLUGIN_DEVICEDIAGNOSTICS=OFF,curl,curl"
+PACKAGECONFIG[deviceinfo]           = "-DPLUGIN_DEVICEINFO=ON,-DPLUGIN_DEVICEINFO=OFF,iarmbus iarmmgrs rfc devicesettings wpeframework-interfaces,iarmbus rfc devicesettings wpeframework-interfaces"
+PACKAGECONFIG[deviceidentification] = "-DPLUGIN_DEVICEIDENTIFICATION=ON,-DPLUGIN_DEVICEIDENTIFICATION=OFF,wpeframework-interfaces,wpeframework-interfaces"
 PACKAGECONFIG[dictionary]           = "-DPLUGIN_DICTIONARY=ON,-DPLUGIN_DICTIONARY=OFF,"
-PACKAGECONFIG[displayinfo]          = "-DPLUGIN_DISPLAYINFO=ON  -DUSE_DEVICESETTINGS=1,-DPLUGIN_DISPLAYINFO=OFF,"
-PACKAGECONFIG[displaysettings]      = "-DPLUGIN_DISPLAYSETTINGS=ON,-DPLUGIN_DISPLAYSETTINGS=OFF,"
-PACKAGECONFIG[framerate]            = "-DPLUGIN_FRAMERATE=ON,-DPLUGIN_FRAMERATE=OFF,"
-PACKAGECONFIG[hdcpprofile]          = "-DPLUGIN_HDCPPROFILE=ON,-DPLUGIN_HDCPPROFILE=OFF,"
-PACKAGECONFIG[hdmicec]              = "-DPLUGIN_HDMICEC=ON,-DPLUGIN_HDMICEC=OFF,"
-PACKAGECONFIG[hdmicec2]             = "-DPLUGIN_HDMICEC2=ON,-DPLUGIN_HDMICEC2=OFF,"
-PACKAGECONFIG[hdmicecsource]        = "-DPLUGIN_HDMICECSOURCE=ON,-DPLUGIN_HDMICECSOURCE=OFF,"
-PACKAGECONFIG[hdmiinput]            = "-DPLUGIN_HDMIINPUT=ON,-DPLUGIN_HDMIINPUT=OFF,"
-PACKAGECONFIG[compositeinput]       = "-DPLUGIN_COMPOSITEINPUT=ON,-DPLUGIN_COMPOSITEINPUT=OFF,"
+PACKAGECONFIG[displayinfo]          = "-DPLUGIN_DISPLAYINFO=ON  -DUSE_DEVICESETTINGS=1,-DPLUGIN_DISPLAYINFO=OFF,iarmbus iarmmgrs wpeframework-interfaces devicesettings,iarmbus wpeframework-interfaces devicesettings"
+PACKAGECONFIG[displaysettings]      = "-DPLUGIN_DISPLAYSETTINGS=ON,-DPLUGIN_DISPLAYSETTINGS=OFF,iarmbus iarmmgrs rfc devicesettings,iarmbus rfc devicesettings"
+PACKAGECONFIG[framerate]            = "-DPLUGIN_FRAMERATE=ON,-DPLUGIN_FRAMERATE=OFF,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
+PACKAGECONFIG[hdcpprofile]          = "-DPLUGIN_HDCPPROFILE=ON,-DPLUGIN_HDCPPROFILE=OFF,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
+PACKAGECONFIG[hdmicec]              = "-DPLUGIN_HDMICEC=ON,-DPLUGIN_HDMICEC=OFF,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
+PACKAGECONFIG[hdmicec2]             = "-DPLUGIN_HDMICEC2=ON,-DPLUGIN_HDMICEC2=OFF,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
+PACKAGECONFIG[hdmicecsink]          = "-DPLUGIN_HDMICECSINK=ON,,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
+PACKAGECONFIG[hdmicecsource]        = "-DPLUGIN_HDMICECSOURCE=ON,-DPLUGIN_HDMICECSOURCE=OFF,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
+PACKAGECONFIG[hdmiinput]            = "-DPLUGIN_HDMIINPUT=ON,-DPLUGIN_HDMIINPUT=OFF,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
+PACKAGECONFIG[ledcontrol]           = "-DPLUGIN_LEDCONTROL=ON,,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
+PACKAGECONFIG[compositeinput]       = "-DPLUGIN_COMPOSITEINPUT=ON,-DPLUGIN_COMPOSITEINPUT=OFF,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
 PACKAGECONFIG[ioconnector]          = "-DPLUGIN_IOCONNECTOR=ON,-DPLUGIN_IOCONNECTOR=OFF,"
 PACKAGECONFIG[jsonrpcplugin]        = "-DPLUGIN_JSONRPC=ON,-DPLUGIN_JSONRPC=OFF,"
 PACKAGECONFIG[locationsync]         = "-DPLUGIN_LOCATIONSYNC=ON \
                                        -DPLUGIN_LOCATIONSYNC_URI=${WPEFRAMEWORK_LOCATIONSYNC_URI} \
-                                      ,-DPLUGIN_LOCATIONSYNC=OFF,"
-PACKAGECONFIG[loggingpreferences]   = "-DPLUGIN_LOGGINGPREFERENCES=ON,-DPLUGIN_LOGGINGPREFERENCES=OFF,"
-PACKAGECONFIG[messenger]            = "-DPLUGIN_MESSENGER=ON,-DPLUGIN_MESSENGER=OFF,"
-PACKAGECONFIG[monitor]              = "-DPLUGIN_MONITOR=ON ${MONITOR_PLUGIN_ARGS},-DPLUGIN_MONITOR=OFF,"
-PACKAGECONFIG[network]              = "-DPLUGIN_NETWORK=ON,-DPLUGIN_NETWORK=OFF,"
-PACKAGECONFIG[persistent_store]     = "-DPLUGIN_PERSISTENTSTORE=ON,,sqlite3 glib-2.0"
-PACKAGECONFIG[playerinfo]           = "-DPLUGIN_PLAYERINFO=ON -DUSE_DEVICESETTINGS=1,-DPLUGIN_PLAYERINFO=OFF,"
-PACKAGECONFIG[rdkshell]             = "-DPLUGIN_RDKSHELL=ON,-DPLUGIN_RDKSHELL=OFF,rdkshell,"
-PACKAGECONFIG[remoteactionmapping]  = "-DPLUGIN_REMOTEACTIONMAPPING=ON,-DPLUGIN_REMOTEACTIONMAPPING=OFF,"
-PACKAGECONFIG[screencapture]        = "-DPLUGIN_SCREENCAPTURE=ON,-DPLUGIN_SCREENCAPTURE=OFF,"
-PACKAGECONFIG[securityagent]        = "-DPLUGIN_SECURITYAGENT=ON -DPLUGIN_SECURITYAGENT_DAC_FOLDER=/opt/secure/securityagent/dac,-DPLUGIN_SECURITYAGENT=OFF,"
-PACKAGECONFIG[stateobserver]        = "-DPLUGIN_STATEOBSERVER=ON,-DPLUGIN_STATEOBSERVER=OFF,"
+                                      ,-DPLUGIN_LOCATIONSYNC=OFF,wpeframework-interfaces,wpeframework-interfaces"
+PACKAGECONFIG[loggingpreferences]   = "-DPLUGIN_LOGGINGPREFERENCES=ON,-DPLUGIN_LOGGINGPREFERENCES=OFF,iarmbus iarmmgrs,iarmbus"
+PACKAGECONFIG[messenger]            = "-DPLUGIN_MESSENGER=ON,-DPLUGIN_MESSENGER=OFF,wpeframework-interfaces,wpeframework-interfaces"
+PACKAGECONFIG[monitor]              = "-DPLUGIN_MONITOR=ON ${MONITOR_PLUGIN_ARGS},-DPLUGIN_MONITOR=OFF,wpeframework-interfaces,wpeframework-interfaces"
+PACKAGECONFIG[motiondetection]      = "-DPLUGIN_MOTION_DETECTION=ON,,motiondetector-hal,motiondetector-hal"
+PACKAGECONFIG[network]              = "-DPLUGIN_NETWORK=ON,-DPLUGIN_NETWORK=OFF,iarmbus iarmmgrs rfc,iarmbus rfc netsrvmgr"
+PACKAGECONFIG[persistent_store]     = "-DPLUGIN_PERSISTENTSTORE=ON,-DPLUGIN_PERSISTENTSTORE=OFF,sqlite3 wpeframework-interfaces,wpeframework-interfaces"
+PACKAGECONFIG[playerinfo]           = "-DPLUGIN_PLAYERINFO=ON -DUSE_DEVICESETTINGS=1,-DPLUGIN_PLAYERINFO=OFF,iarmbus iarmmgrs wpeframework-interfaces devicesettings gstreamer1.0,iarmbus wpeframework-interfaces devicesettings gstreamer1.0"
+PACKAGECONFIG[rdkshell]             = "-DPLUGIN_RDKSHELL=ON,-DPLUGIN_RDKSHELL=OFF,rdkshell wpeframework-interfaces,rdkshell wpeframework-interfaces"
+PACKAGECONFIG[remoteactionmapping]  = "-DPLUGIN_REMOTEACTIONMAPPING=ON,-DPLUGIN_REMOTEACTIONMAPPING=OFF,iarmbus iarmmgrs ctrlm-headers,iarmbus ctrlm"
+PACKAGECONFIG[rustadapter]          = "-DPLUGIN_RUSTADAPTER=ON,,,"
+PACKAGECONFIG[screencapture]        = "-DPLUGIN_SCREENCAPTURE=ON,-DPLUGIN_SCREENCAPTURE=OFF,wpeframework-interfaces curl libpng,wpeframework-interfaces curl libpng"
+PACKAGECONFIG[securityagent]        = "-DPLUGIN_SECURITYAGENT=ON -DPLUGIN_SECURITYAGENT_DAC_FOLDER=/opt/secure/securityagent/dac,-DPLUGIN_SECURITYAGENT=OFF,wpeframework-interfaces,wpeframework-interfaces"
+PACKAGECONFIG[stateobserver]        = "-DPLUGIN_STATEOBSERVER=ON,-DPLUGIN_STATEOBSERVER=OFF,iarmbus iarmmgrs cjson,iarmbus cjson"
+PACKAGECONFIG[systemaudioplayer]    = "-DPLUGIN_SYSTEMAUDIOPLAYER=ON,,wpeframework-interfaces trower-base64 boost websocketpp wpeframework-clientlibraries openssl gstreamer1.0 gstreamer1.0-plugins-base,wpeframework-interfaces trower-base64 wpeframework-clientlibraries openssl gstreamer1.0 gstreamer1.0-plugins-base"
 PACKAGECONFIG[systemdconnector]     = "-DPLUGIN_SYSTEMDCONNECTOR=ON,-DPLUGIN_SYSTEMDCONNECTOR=OFF,"
-PACKAGECONFIG[maintenancemanager]   = "-DPLUGIN_MAINTENANCEMANAGER=ON,-DPLUGIN_MAINTENANCEMANAGER=OFF,"
-PACKAGECONFIG[systemservices]       = "-DPLUGIN_SYSTEMSERVICES=ON,-DPLUGIN_SYSTEMSERVICES=OFF,,tzcode"
-PACKAGECONFIG[timer]                = "-DPLUGIN_TIMER=ON,-DPLUGIN_TIMER=OFF,"
+PACKAGECONFIG[maintenancemanager]   = "-DPLUGIN_MAINTENANCEMANAGER=ON,-DPLUGIN_MAINTENANCEMANAGER=OFF,iarmbus iarmmgrs rfc,iarmbus rfc"
+PACKAGECONFIG[systemservices]       = "-DPLUGIN_SYSTEMSERVICES=ON,-DPLUGIN_SYSTEMSERVICES=OFF,iarmbus iarmmgrs rfc devicesettings curl,tzcode iarmbus rfc devicesettings curl"
+PACKAGECONFIG[systimemgrsupport]    = "-DBUILD_ENABLE_SYSTIMEMGR_SUPPORT=ON,,systimemgrinetrface,"
+PACKAGECONFIG[telemetry]            = "-DPLUGIN_TELEMETRY=ON,,iarmbus iarmmgrs rfc rbus,iarmbus rfc rbus"
+PACKAGECONFIG[timer]                = "-DPLUGIN_TIMER=ON,-DPLUGIN_TIMER=OFF,iarmbus iarmmgrs,iarmbus"
 PACKAGECONFIG[timesync]             = "-DPLUGIN_TIMESYNC=ON,-DPLUGIN_TIMESYNC=OFF,"
-PACKAGECONFIG[tracecontrol]         = "-DPLUGIN_TRACECONTROL=ON,-DPLUGIN_TRACECONTROL=OFF,"
-PACKAGECONFIG[userpreferences]      = "-DPLUGIN_USERPREFERENCES=ON,-DPLUGIN_USERPREFERENCES=OFF,"
+PACKAGECONFIG[tracecontrol]         = "-DPLUGIN_TRACECONTROL=ON,-DPLUGIN_TRACECONTROL=OFF,wpeframework-interfaces,wpeframework-interfaces"
+PACKAGECONFIG[userpreferences]      = "-DPLUGIN_USERPREFERENCES=ON,-DPLUGIN_USERPREFERENCES=OFF,glib-2.0,glib-2.0"
 PACKAGECONFIG[virtualinput]         = "-DPLUGIN_COMPOSITOR_VIRTUALINPUT=ON,-DPLUGIN_COMPOSITOR_VIRTUALINPUT=OFF,"
-PACKAGECONFIG[warehouse]            = "-DPLUGIN_WAREHOUSE=ON,-DPLUGIN_WAREHOUSE=OFF,"
+PACKAGECONFIG[warehouse]            = "-DPLUGIN_WAREHOUSE=ON,-DPLUGIN_WAREHOUSE=OFF,iarmbus iarmmgrs rfc devicesettings,iarmbus rfc devicesettings"
 PACKAGECONFIG[webproxy]             = "-DPLUGIN_WEBPROXY=ON,-DPLUGIN_WEBPROXY=OFF,"
 PACKAGECONFIG[webserver]            = "-DPLUGIN_WEBSERVER=ON \
                                        -DPLUGIN_WEBSERVER_PORT="${PLUGIN_WEBSERVER_PORT}" \
@@ -151,15 +157,18 @@ PACKAGECONFIG[webserver]            = "-DPLUGIN_WEBSERVER=ON \
 PACKAGECONFIG[webshell]             = "-DPLUGIN_WEBSHELL=ON,-DPLUGIN_WEBSHELL=OFF,"
 PACKAGECONFIG[wifi]                 = "-DPLUGIN_WIFICONTROL=ON,-DPLUGIN_WIFICONTROL=OFF,,wpa-supplicant"
 PACKAGECONFIG[wifi_rdkhal]          = "-DPLUGIN_USE_RDK_HAL_WIFI=ON,-DPLUGIN_USE_RDK_HAL_WIFI=OFF,,wifi-hal"
-PACKAGECONFIG[wifimanager]          = "-DPLUGIN_WIFIMANAGER=ON,-DPLUGIN_WIFIMANAGER=OFF,netsrvmgr,"
-PACKAGECONFIG[xcast]                = "-DPLUGIN_XCAST=ON,-DPLUGIN_XCAST=OFF,"
-PACKAGECONFIG[ocicontainer]         = "-DPLUGIN_OCICONTAINER=ON, -DPLUGIN_OCICONTAINER=OFF, dobby, dobby"
-PACKAGECONFIG[usbaccess]            = "-DPLUGIN_USBACCESS=ON,-DPLUGIN_USBACCESS=OFF,"
-PACKAGECONFIG[erm]                  = "-DBUILD_ENABLE_ERM=ON,-DBUILD_ENABLE_ERM=OFF,"
-PACKAGECONFIG[fireboltmediaplayer]  = "-DPLUGIN_FIREBOLTMEDIAPLAYER=ON,-DPLUGIN_FIREBOLTMEDIAPLAYER=OFF, aamp, aamp"
-PACKAGECONFIG[dlna] = "-DPLUGIN_DLNA_SERVICE=ON, -DPLUGIN_DLNA_SERVICE=OFF,xupnp-rpc,xupnp-rpc"
-PACKAGECONFIG[mediaenginermf]     = "-DPLUGIN_MEDIAENGINERMF=ON,,rmfgeneric, rmfgeneric"
+PACKAGECONFIG[wifimanager]          = "-DPLUGIN_WIFIMANAGER=ON,-DPLUGIN_WIFIMANAGER=OFF,netsrvmgr iarmbus iarmmgrs,iarmbus"
+PACKAGECONFIG[xcast]                = "-DPLUGIN_XCAST=ON,-DPLUGIN_XCAST=OFF,iarmbus iarmmgrs rfc pxcore-libnode rtremote,iarmbus rfc pxcore-libnode rtremote"
+PACKAGECONFIG[ocicontainer]         = "-DPLUGIN_OCICONTAINER=ON, -DPLUGIN_OCICONTAINER=OFF, dobby systemd, dobby systemd"
+PACKAGECONFIG[usbaccess]            = "-DPLUGIN_USBACCESS=ON,-DPLUGIN_USBACCESS=OFF,iarmbus iarmmgrs udev,iarmbus udev"
+PACKAGECONFIG[erm]                  = "-DBUILD_ENABLE_ERM=ON,-DBUILD_ENABLE_ERM=OFF,essos,essos"
+PACKAGECONFIG[fireboltmediaplayer]  = "-DPLUGIN_FIREBOLTMEDIAPLAYER=ON,-DPLUGIN_FIREBOLTMEDIAPLAYER=OFF, aamp wpeframework-interfaces, aamp wpeframework-interfaces"
+PACKAGECONFIG[dlna]                 = "-DPLUGIN_DLNA_SERVICE=ON, -DPLUGIN_DLNA_SERVICE=OFF,xupnp-rpc,xupnp-rpc"
+PACKAGECONFIG[mediaenginermf]       = "-DPLUGIN_MEDIAENGINERMF=ON,-DPLUGIN_MEDIAENGINERMF=OFF,rmfgeneric, rmfgeneric"
 PACKAGECONFIG[airplayservice]       = "-DPLUGIN_AIRPLAYSERVICE=ON,-DPLUGIN_PLUGIN_AIRPLAYSERVICE=OFF,"
+PACKAGECONFIG[messagecontrol]       = "-DPLUGIN_MESSAGECONTROL=ON,-DPLUGIN_MESSAGECONTROL=OFF,wpeframework-interfaces,wpeframework-interfaces"
+
+# ----------------------------------------------------------------------------
 
 MONITOR_PLUGIN_ARGS                ?= " \
                                        -DPLUGIN_WEBKITBROWSER_MEMORYLIMIT=614400 \
@@ -174,7 +183,6 @@ EXTRA_OECMAKE += " \
     -DBUILD_REFERENCE=${SRCREV} \
     -DBUILD_SHARED_LIBS=ON \
     -DSECAPI_LIB=sec_api \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'systimemgr',     '-DBUILD_ENABLE_SYSTIMEMGR_SUPPORT=ON', '', d)} \
 "
 
 do_install_append() {
