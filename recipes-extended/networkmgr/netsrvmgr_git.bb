@@ -108,6 +108,7 @@ do_install_append() {
             install -d ${D}${base_libdir}/rdk
             install -m 0755 ${S}/pni_controller.sh ${D}${base_libdir}/rdk/
             install -m 0755 ${S}/wifi_addr_reset.sh ${D}${base_libdir}/rdk/
+            install -m 0755 ${S}/get_wifi_channel_utilization.sh ${D}${base_libdir}/rdk/
         fi
 
 }
@@ -126,6 +127,7 @@ FILES_${PN} += "${sysconfdir}/netsrvmgr.conf"
 FILES_${PN} += "${sysconfdir}/netsrvmgr_Telemetry_LoggingParams.json"
 FILES_${PN} += "${systemd_unitdir}/system/netsrvmgr.service"
 FILES_${PN} += "${base_libdir}/rdk/wifi_addr_reset.sh"
+FILES_${PN} += "${base_libdir}/rdk/get_wifi_channel_utilization.sh"
 
 SYSTEMD_SERVICE_${PN}-pni-controller += "pni_controller.service"
 SYSTEMD_AUTO_ENABLE_${PN}-pni-controller = "disable"
