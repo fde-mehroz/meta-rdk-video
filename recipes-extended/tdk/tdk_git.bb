@@ -156,6 +156,11 @@ do_install_append () {
     install -m 755 ${S}/SystemUtil_stub/scripts/rdk6_version.config ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/sanity_check.config ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check_before_reboot.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check_after_reboot.sh ${D}${TDK_TARGETDIR}/    
+    install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check_eth_wifi_toggle_functionality.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_lightsleep_service_status.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_lightsleep_service_status_after_reboot.sh ${D}${TDK_TARGETDIR}/
     if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_firebolt_compliance_tdk', 'true', 'false', d)}; then
         install -m 755 ${S}/FireboltCompliance_Validation/scripts/RunGraphicsTDKTest.sh ${D}${TDK_TARGETDIR}/
         install -m 755 ${S}/FireboltCompliance_Validation/scripts/ExecuteSuite.sh ${D}${TDK_TARGETDIR}/opensourcecomptest/
