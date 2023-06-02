@@ -41,6 +41,12 @@ EXTRA_OECONF_append_qemux86mc = " --enable-qemux86mc"
 EXTRA_OECONF_append_qemux86hyb = " --enable-qemux86hyb"
 ASNEEDED= ""
 
+#Default components for Hybrid and Client devices
+EXTRA_OECONF_append_hybrid = " --enable-trm"
+EXTRA_OECONF_append_hybrid = " --enable-dtcp"
+EXTRA_OECONF_append_hybrid = " --enable-snmp"
+EXTRA_OECONF_append_client = " --enable-tr69"
+EXTRA_OECONF_append_client = " --enable-netsrvmgr"
 
 inherit autotools systemd pkgconfig
 
