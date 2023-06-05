@@ -17,7 +17,7 @@ SRC_URI += "file://23/0001-Include-RDK-platforms.patch"
 SRC_URI += "file://23/0002-Fix-crashpad-build.patch"
 SRC_URI += "file://23/0003-breakpad-add-mapping-info.patch"
 
-PR = "3"
+PR = "4"
 SRCREV_cobalt = "23.lts.${PR}"
 SRCREV_starboard = "${STARBOARD_SRCREV}"
 

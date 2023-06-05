@@ -18,7 +18,7 @@ SRC_URI  = "git://cobalt.googlesource.com/cobalt.git;protocol=https;name=cobalt;
 SRC_URI += "${STARBOARD_SRC_URI};protocol=${CMF_GIT_PROTOCOL};destsuffix=starboard;name=starboard;branch=master"
 SRC_URI += "file://23/0001-Include-RDK-platforms.patch"
 
-PR = "3"
+PR = "4"
 SRCREV_cobalt = "23.lts.${PR}"
 SRCREV_starboard = "${STARBOARD_SRCREV}"
 

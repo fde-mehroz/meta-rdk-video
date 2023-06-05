@@ -13,8 +13,8 @@ CLANG_BUILD_SUBDIR = "${TOOLCHAINS_DIR}/x86_64-linux-gnu-clang-chromium-${CLANG_
 SRC_URI  = "git://cobalt.googlesource.com/cobalt.git;protocol=https;name=cobalt;branch=23.lts.stable"
 SRC_URI += "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-${CLANG_BUILD_REVISION}.tgz;subdir=${CLANG_BUILD_SUBDIR};name=clang"
 
-PV = "3.3.9"
-SRCREV_cobalt = "23.lts.3"
+PV = "3.4.6"
+SRCREV_cobalt = "23.lts.4"
 do_fetch[vardeps] += " SRCREV_FORMAT SRCREV_cobalt"
 
 SRC_URI[clang.sha256sum] = "3adf7a2338e86c202527f6bfaa945697eb2189b8965f7598d9d1159a195dbd51"
