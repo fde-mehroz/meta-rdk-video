@@ -63,6 +63,7 @@ do_install_append () {
         install -D -p -m 755 ${D}${bindir}/gen_single_event ${D}${TDK_TARGETDIR}/
         install -D -p -m 755 ${D}${bindir}/gen_multiple_events ${D}${TDK_TARGETDIR}/
         install -D -p -m 755 ${D}${bindir}/tdk_mediapipelinetests ${D}${TDK_TARGETDIR}/
+        install -D -p -m 755 ${D}${bindir}/tdk_apparmoraccess ${D}${TDK_TARGETDIR}/
         install -D -p -m 755 ${D}${bindir}/tdk_mediapipelinetests_trickplay ${D}${TDK_TARGETDIR}/
         if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_firebolt_compliance_tdk', 'true', 'false', d)}; then
             install -D -p -m 755 ${D}${bindir}/Essos_TDKTestApp ${D}${TDK_TARGETDIR}/
@@ -82,6 +83,7 @@ do_install_append () {
         install -D -p -m 755 ${D}${bindir}/gen_multiple_events ${D}${TDK_TARGETDIR}/
         install -D -p -m 755 ${D}${bindir}/tdk_mediapipelinetests ${D}${TDK_TARGETDIR}/
         install -D -p -m 755 ${D}${bindir}/tdk_mediapipelinetests_trickplay ${D}${TDK_TARGETDIR}/
+        install -D -p -m 755 ${D}${bindir}/tdk_apparmoraccess ${D}${TDK_TARGETDIR}/
         if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_firebolt_compliance_tdk', 'true', 'false', d)}; then
             install -D -p -m 755 ${D}${bindir}/Essos_TDKTestApp ${D}${TDK_TARGETDIR}/
             install -D -p -m 755 ${D}${bindir}/Westeros_TDKTestApp ${D}${TDK_TARGETDIR}/
@@ -96,6 +98,7 @@ do_install_append () {
         rm -rf ${D}${bindir}/gen_multiple_events
         rm -rf ${D}${bindir}/tdk_mediapipelinetests
         rm -rf ${D}${bindir}/tdk_mediapipelinetests_trickplay
+        rm -rf ${D}${bindir}/tdk_apparmoraccess
         if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_firebolt_compliance_tdk', 'true', 'false', d)}; then
             rm -rf ${D}${bindir}/Essos_TDKTestApp
             rm -rf ${D}${bindir}/Westeros_TDKTestApp
@@ -110,6 +113,7 @@ do_install_append () {
         ln -sf ${bindir}/gen_multiple_events ${D}${TDK_TARGETDIR}/
         ln -sf ${bindir}/tdk_mediapipelinetests ${D}${TDK_TARGETDIR}/
         ln -sf ${bindir}/tdk_mediapipelinetests_trickplay ${D}${TDK_TARGETDIR}/
+        ln -sf ${bindir}/tdk_apparmoraccess ${D}${TDK_TARGETDIR}/
         if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_firebolt_compliance_tdk', 'true', 'false', d)}; then
             ln -sf ${bindir}/Essos_TDKTestApp ${D}${TDK_TARGETDIR}/
             ln -sf ${bindir}/Westeros_TDKTestApp ${D}${TDK_TARGETDIR}/
@@ -130,6 +134,7 @@ do_install_append () {
         ln -sf ${bindir}/gen_multiple_events ${D}${TDK_TARGETDIR}/
         ln -sf ${bindir}/tdk_mediapipelinetests ${D}${TDK_TARGETDIR}/
         ln -sf ${bindir}/tdk_mediapipelinetests_trickplay ${D}${TDK_TARGETDIR}/
+        ln -sf ${bindir}/tdk_apparmoraccess ${D}${TDK_TARGETDIR}/
         if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_firebolt_compliance_tdk', 'true', 'false', d)}; then
             ln -sf ${bindir}/Essos_TDKTestApp ${D}${TDK_TARGETDIR}/
             ln -sf ${bindir}/Westeros_TDKTestApp ${D}${TDK_TARGETDIR}/
@@ -167,6 +172,7 @@ do_install_append () {
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check_eth_wifi_toggle_functionality.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_lightsleep_service_status.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_lightsleep_service_status_after_reboot.sh ${D}${TDK_TARGETDIR}/
+    install -m 755 ${S}/Apparmor_Stub/scripts/tdk_sample.profile ${D}${TDK_TARGETDIR}/
     if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_firebolt_compliance_tdk', 'true', 'false', d)}; then
         install -m 755 ${S}/FireboltCompliance_Validation/scripts/RunGraphicsTDKTest.sh ${D}${TDK_TARGETDIR}/
         install -m 755 ${S}/FireboltCompliance_Validation/scripts/ExecuteSuite.sh ${D}${TDK_TARGETDIR}/opensourcecomptest/
