@@ -40,7 +40,7 @@ do_install() {
     install -m 644 ${S}/include/ctrlm_hal_ip.h ${D}${includedir}
     install -m 644 ${S}/include/ctrlm_hal_ble.h ${D}${includedir}
     install -m 644 ${S}/include/ctrlm_hal_rf4ce.h ${D}${includedir}
-    
+
     install -d ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/ctrlm_vendor_network_factory.h ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/ctrlm_voice_packet_analysis.h ${D}${includedir}/ctrlm_private
@@ -51,11 +51,11 @@ do_install() {
     install -m 644 ${S}/src/asb/ctrlm_asb.h ${D}${includedir}/ctrlm_private
     # IRDB Support
     install -m 644 ${S}/src/irdb/ctrlm_irdb_factory.h ${D}${includedir}/ctrlm_private
-    install -m 644 ${S}/src/irdb/ctrlm_irdb.h ${D}${includedir}/ctrlm_private
+    install -m 644 ${S}/src/irdb/ctrlm_irdb.h ${D}${includedir}
     install -m 644 ${S}/src/irdb/ctrlm_irdb_stub.h ${D}${includedir}/ctrlm_private
-    install -m 644 ${S}/src/irdb/ipc/ctrlm_irdb_ipc.h ${D}${includedir}/ctrlm_private
+    install -m 644 ${S}/src/irdb/ipc/ctrlm_irdb_ipc.h ${D}${includedir}
     install -m 644 ${S}/src/irdb/ipc/ctrlm_irdb_ipc_iarm_thunder.h ${D}${includedir}/ctrlm_private
-    
+
     # Network Support
     install -m 644 ${S}/src/ctrlm.h ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/ctrlm_rcu.h ${D}${includedir}/ctrlm_private
