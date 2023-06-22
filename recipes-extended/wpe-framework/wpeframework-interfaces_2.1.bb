@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch
            file://r2/0001-RDK-37042-Add-interfaces-for-Airplay-Plugin.patch \
            file://r2/0001-RDK-40478-Run-AirplayDaemon-as-thunder-plugin.patch \
            file://r2/0001-Add-TextToSpeech-Interface.patch \
+           file://0001-add-PersistLoadWatermark.patch \
            "
 
 # Sep 29, 2022

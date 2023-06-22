@@ -13,10 +13,9 @@ RDEPENDS_${PN} += "gst-plugins-rdk-aamp devicesettings"
 
 NO_RECOMMENDATIONS = "1"
 
-AAMP_RELEASE_TAG_NAME ?= "5.6.1.0"
+AAMP_RELEASE_TAG_NAME ?= "5.6.2.0"
 
 SRC_URI = "${CMF_GIT_ROOT}/rdk/components/generic/aamp;protocol=${CMF_GIT_PROTOCOL};branch=${AAMP_RELEASE_TAG_NAME};nobranch=1;name=aamp"
-SRC_URI += "${@bb.utils.contains('AAMP_RELEASE_TAG_NAME', 'dev_sprint_22_1', 'file://0001-Updated-Find-JSC-include-path.patch', 'file://0001-Find-JSC-include-path.patch', d)}"
 SRC_URI += "file://aamp-opencdm-cbcs.patch"
 SRC_URI += "file://WPEFramework_Protocols_changed_R4.2.patch"
 
