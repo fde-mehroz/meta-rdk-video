@@ -22,6 +22,7 @@ SRC_URI += "file://r2/0003-OCDM-increase-RPC-comm-timeout.patch \
            file://r2/0001-RDK-28534-Security-Agent-Utility-and-Logging.patch \
            file://r2/0001-RDK-30034-callsign.patch \
            file://r2/0004-Enable-BrowserConsoleLog-by-default.patch \
+           file://r2/0005-Enable-LocatioSync-log-by-default.patch \
            file://r2/603.patch \
            file://r2/0001-Support-negative-numbers-with-write_config.patch \
            file://r2/LLAMA-2254_fix_netlink_buffer_size_error.patch \

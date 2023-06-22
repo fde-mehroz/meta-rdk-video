@@ -1,0 +1,50 @@
+From 34c42740270e0d6cb519a28724a3e6e8b89101ad Mon Sep 17 00:00:00 2001
+From: Sergey Borushevsky <Sergey_Borushevsky2@cable.comcast.com>
+Date: Sat, 19 Jun 2021 17:45:04 +0000
+Subject: added logging for LocationSync internet probe
+Source: COMCAST
+Upstream-Status: N/A
+Signed-off-by: Sergey Borushevsky <Sergey_Borushevsky2@cable.comcast.com>
+
+diff -upr git.orig/Source/WPEFramework/GenericConfig.cmake git/Source/WPEFramework/GenericConfig.cmake
+--- git.orig/Source/WPEFramework/GenericConfig.cmake	2023-02-13 21:02:54.205158335 +0200
++++ git/Source/WPEFramework/GenericConfig.cmake	2023-05-25 23:48:49.071078269 +0300
+@@ -155,6 +155,27 @@ map()
+ end()
+ ans(PLUGIN_WEBKITBROWSEREXTENSION_TRACING)
+ 
++map()
++    kv(category "Information")
++    kv(module "Plugin_LocationSync")
++    kv(enabled true)
++end()
++ans(PLUGIN_LOCATIONSYNC_INFO_TRACING)
++
++map()
++    kv(category "Warning")
++    kv(module "Plugin_LocationSync")
++    kv(enabled true)
++end()
++ans(PLUGIN_LOCATIONSYNC_WARN_TRACING)
++
++map()
++    kv(category "Error")
++    kv(module "Plugin_LocationSync")
++    kv(enabled true)
++end()
++ans(PLUGIN_LOCATIONSYNC_ERR_TRACING)
++
+ if(NOT VIRTUALINPUT)
+     map()
+     kv(locator "/dev/uinput")
+@@ -188,6 +209,10 @@ map_append(${CONFIG} tracing ${PLUGIN_NO
+ map_append(${CONFIG} tracing ${PLUGIN_FATAL_TRACING})
+ map_append(${CONFIG} tracing ${PLUGIN_WEBKITBROWSER_TRACING})
+ map_append(${CONFIG} tracing ${PLUGIN_WEBKITBROWSEREXTENSION_TRACING})
++
++map_append(${CONFIG} tracing ${PLUGIN_LOCATIONSYNC_INFO_TRACING})
++map_append(${CONFIG} tracing ${PLUGIN_LOCATIONSYNC_WARN_TRACING})
++map_append(${CONFIG} tracing ${PLUGIN_LOCATIONSYNC_ERR_TRACING})
+ endif(TRACE_SETTINGS)
+ 
+ map_append(${PLUGIN_CONTROLLER} configuration ${PLUGIN_CONTROLLER_CONFIGURATION})
