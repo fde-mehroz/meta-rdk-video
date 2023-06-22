@@ -33,6 +33,7 @@ SRC_URI += "file://r4/0001-RDK-28534-Security-Agent-Utility-and-Logging.patch \
             file://r4/0001_Reverted_changes_Fix_JSON_Reset_R3.5_for_SystemServicesPlugin.patch \
             file://r4/activationevent.patch \
             file://r4/wpeframework_added_optimization_flag_improvement.patch \
+            file://r4/DELIA-56519_wpeframework_fix_R4.patch \
             "
 
 inherit systemd update-rc.d pythonnative
