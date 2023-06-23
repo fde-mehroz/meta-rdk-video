@@ -161,6 +161,7 @@ PACKAGECONFIG[erm]                  = "-DBUILD_ENABLE_ERM=ON,-DBUILD_ENABLE_ERM=
 PACKAGECONFIG[fireboltmediaplayer]  = "-DPLUGIN_FIREBOLTMEDIAPLAYER=ON,-DPLUGIN_FIREBOLTMEDIAPLAYER=OFF, aamp wpeframework-interfaces, aamp wpeframework-interfaces"
 PACKAGECONFIG[dlna]                 = "-DPLUGIN_DLNA_SERVICE=ON, -DPLUGIN_DLNA_SERVICE=OFF,xupnp-rpc,xupnp-rpc"
 PACKAGECONFIG[mediaenginermf]       = "-DPLUGIN_MEDIAENGINERMF=ON,-DPLUGIN_MEDIAENGINERMF=OFF,rmfgeneric, rmfgeneric"
+PACKAGECONFIG[unifiedcasmanagement] = "-DPLUGIN_UNIFIEDCASMANAGEMENT=ON,,rmfgeneric, rmfgeneric"
 PACKAGECONFIG[airplayservice]       = "-DPLUGIN_AIRPLAYSERVICE=ON,-DPLUGIN_PLUGIN_AIRPLAYSERVICE=OFF,"
 PACKAGECONFIG[messagecontrol]       = "-DPLUGIN_MESSAGECONTROL=ON,-DPLUGIN_MESSAGECONTROL=OFF,wpeframework-interfaces,wpeframework-interfaces"
 

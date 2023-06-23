@@ -37,6 +37,7 @@ do_install() {
 	install -m 0644 ${S}/transcoderfilter/*.h ${D}${includedir}
 	install -m 0644 ${S}/vodsource/*.h ${D}${includedir}
 	install -m 0644 ${S}/libmediaplayer/libmediaplayer.h ${D}${includedir}
+	install -m 0644 ${S}/libmediaplayer/CASService.h ${D}${includedir}
 	install -m 0644 ${S}/webkitsink/*.h ${D}${includedir}
 	install -m 0644 ${S}/snmp/snmpmanager/*.h ${D}${includedir}
 	install -m 0644 ${S}/snmp/ipcclient/*.h ${D}${includedir}
@@ -56,6 +57,7 @@ do_install() {
 	if [ "${@bb.utils.contains('DISTRO_FEATURES', 'external-cas', 'external-cas', '', d)}" != "" ]; then
 		install -m 0644 ${S}/anycas/include/*.h ${D}${includedir}
 		install -m 0644 ${S}/anycas/src/include/*.h ${D}${includedir}
+		install -m 0644 ${S}/libmediaplayer/AnyCasCASServiceImpl.h ${D}${includedir}
 	fi
 }
 
