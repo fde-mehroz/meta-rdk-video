@@ -32,8 +32,8 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://R4.2_DeviceInfo_compilation_error.patch', ' ', d)} \
           "
 
-# June 22 2023
-SRCREV = "874c74e3bf52ce20212cb455aaa07f83577471e8"
+# June 26 2023
+SRCREV = "300b8f73a6ea91fa918e88e9694d319ec7e449fb"
 
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "-DCMAKE_SYSROOT=${STAGING_DIR_HOST}"
@@ -74,7 +74,7 @@ PACKAGECONFIG ?= " \
     activitymonitor avinput continuewatching controlservice voicecontrol remotecontrol datacapture devicediagnostics \
     displaysettings framerate hdcpprofile hdmicec hdmiinput loggingpreferences \
     messenger remoteactionmapping screencapture securityagent stateobserver \
-    systemservices timer tracecontrol userpreferences warehouse monitor locationsync texttospeech persistent_store airplayservice \
+    systemservices timer userpreferences warehouse monitor locationsync texttospeech persistent_store airplayservice \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluetoothcontrol', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'opencdm',              'opencdmi', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'playready_nexus_svp',  'opencdmi_prnx_svp', '', d)} \
@@ -87,6 +87,7 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'fireboltmediaplayer', 'fireboltmediaplayer', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'dlnasupport', ' dlna', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'flex2_rdk', ' hdmicecsource', ' ', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'messagecontrol', 'tracecontrol', d)} \
 "
 
 PACKAGECONFIG_remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' tracecontrol', '', d)}"
