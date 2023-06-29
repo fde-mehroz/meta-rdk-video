@@ -25,15 +25,14 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            file://0001-RDKTV-20749-Revert-Merge-pull-request-3336-from-npol.patch \
            file://0001-RDK-39924-Launch-Airplay-App-from-Airplay-icon-sel.patch \
            file://0001-rdkservices_cbcs_changes.patch \
-           file://0001-RDK-41681-Update-TextToSpeech-Implementation.patch \
            file://0001-RDK-41681-PR4013.patch \
            file://0002-Adding-Support-For-R4.patch \
            ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://0003-Messenger_Plugin-Compilation-Fix-For-R4.patch', ' ', d)} \
            ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://R4.2_DeviceInfo_compilation_error.patch', ' ', d)} \
           "
 
-# June 26 2023
-SRCREV = "300b8f73a6ea91fa918e88e9694d319ec7e449fb"
+# June 30 2023
+SRCREV = "98847fbc52ebee8c72b168436fd9b8ebe5dd94c9"
 
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "-DCMAKE_SYSROOT=${STAGING_DIR_HOST}"
