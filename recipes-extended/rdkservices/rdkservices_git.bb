@@ -32,7 +32,7 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
           "
 
 # July 5 2023
-SRCREV = "91f98bed855f280ef352c7ab7e1d6c8ed71f9852"
+SRCREV = "d8a8731af60eb923e2fb87da23f44080937efe27"
 
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "-DCMAKE_SYSROOT=${STAGING_DIR_HOST}"
