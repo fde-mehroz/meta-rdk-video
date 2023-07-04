@@ -31,8 +31,8 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://R4.2_DeviceInfo_compilation_error.patch', ' ', d)} \
           "
 
-# July 3 2023
-SRCREV = "ddb57042ae9ee6b80ac0a5d95c3bb8eff019f970"
+# July 4 2023
+SRCREV = "9843d83a4fe20eb3edb4e859c18ec93c1dc8d8e6"
 
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "-DCMAKE_SYSROOT=${STAGING_DIR_HOST}"
