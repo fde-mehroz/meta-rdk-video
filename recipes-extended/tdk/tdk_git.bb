@@ -161,14 +161,10 @@ do_install_append () {
     install -m 755 ${S}/SystemUtil_stub/scripts/tdk_apparmor_tests.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/apparmor_profile.config ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/IARMBUS_stub/scripts/RunAppInBackground.sh ${D}${TDK_TARGETDIR}/
-    install -m 755 ${S}/SystemUtil_stub/scripts/system_device_details_check.sh ${D}${TDK_TARGETDIR}/
-    install -m 755 ${S}/SystemUtil_stub/scripts/system_services_status_check.sh ${D}${TDK_TARGETDIR}/
-    install -m 755 ${S}/SystemUtil_stub/scripts/tdkappsversioncheck.sh ${D}${TDK_TARGETDIR}/
-    install -m 755 ${S}/SystemUtil_stub/scripts/rdk6_version.config ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/sanity_check.config ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check_before_reboot.sh ${D}${TDK_TARGETDIR}/
-    install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check_after_reboot.sh ${D}${TDK_TARGETDIR}/    
+    install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check_after_reboot.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_check_eth_wifi_toggle_functionality.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_lightsleep_service_status.sh ${D}${TDK_TARGETDIR}/
     install -m 755 ${S}/SystemUtil_stub/scripts/system_sanity_lightsleep_service_status_after_reboot.sh ${D}${TDK_TARGETDIR}/
