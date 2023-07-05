@@ -175,18 +175,12 @@ do_install() {
         install -m 0644 ${S}/../systemd_units/update-reboot-info.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/restart-parodus.path ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/restart-parodus.service ${D}${systemd_unitdir}/system
-        install -m 0644 ${S}/../systemd_units/update-rf4ce-details.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/ping-telemetry.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/ping-telemetry.timer ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/gstreamer-cleanup.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/oops-dump.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/path-fail-notifier@.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/../systemd_units/build-time-setter.service ${D}${systemd_unitdir}/system
-        if [ "${RF4CE_CTRLM_ENABLED}" = "false" ]; then
-           sed -i "/^After=/ s/$/ rf4cemgr.service/" ${D}${systemd_unitdir}/system/update-rf4ce-details.service
-        else
-           sed -i "/^After=/ s/$/ ctrlm-main.service/" ${D}${systemd_unitdir}/system/update-rf4ce-details.service
-        fi
 
 	install -m 0755 ${S}/../etc/init.d/dump-backup-service ${D}${sysconfdir}
 	install -m 0755 ${S}/../build/config/* ${D}${sysconfdir}
@@ -340,10 +334,6 @@ do_install_append_hybrid() {
             rm -f ${D}${base_libdir}/rdk/iptables_init_xi
         fi
         
-        if [ -f ${D}${systemd_unitdir}/system/update-rf4ce-details.service ]; then
-            sed -i "/^After=/ s/$/ syssnmpagent.service/" ${D}${systemd_unitdir}/system/update-rf4ce-details.service
-        fi
-
         if [ -f ${S}/etc/xi-xconf-hosts.list ]; then
             install -m 0644 ${S}/etc/xi-xconf-hosts.list ${D}${sysconfdir}
         fi
@@ -403,9 +393,6 @@ do_install_append_client() {
 	# override default disk check
         rm -f ${D}${systemd_unitdir}/system/disk-check.service
         install -m 0644 ${S}/../systemd_units/disk-check-sdcard.service ${D}${systemd_unitdir}/system/disk-check.service 
-        if [ -f ${D}${systemd_unitdir}/system/update-rf4ce-details.service ]; then
-            sed -i "/^After=/ s/$/ tr69agent.service/" ${D}${systemd_unitdir}/system/update-rf4ce-details.service
-        fi
 
         #Remove moca telemetry script on client devices as the snmp is not supported 
         rm -f ${D}${base_libdir}/rdk/moca_telemetry.sh
@@ -492,7 +479,6 @@ SYSTEMD_SERVICE_${PN} += "hddstatuslogger.service"
 SYSTEMD_SERVICE_${PN} += "hddstatuslogger.timer"
 SYSTEMD_SERVICE_${PN} += "update-device-details.service"
 SYSTEMD_SERVICE_${PN} += "mount-failure-count.service"
-SYSTEMD_SERVICE_${PN} += "update-rf4ce-details.service"
 SYSTEMD_SERVICE_${PN} += "ping-telemetry.service"
 SYSTEMD_SERVICE_${PN} += "ping-telemetry.timer"
 SYSTEMD_SERVICE_${PN} += "oops-dump.service"
