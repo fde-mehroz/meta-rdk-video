@@ -78,13 +78,14 @@ new file mode 100644
 index 0000000..d3a583b
 --- /dev/null
 +++ b/jsonrpc/Airplay.json
-@@ -0,0 +1,140 @@
+@@ -0,0 +1,141 @@
 +{
 +  "$schema": "interface.schema.json",
 +  "jsonrpc": "2.0",
 +  "info": {
 +    "title": "Airplay API",
 +    "class": "AirplayJSONRPC",
++    "format": "uncompliant-extended",
 +    "description": "Airplay JSON-RPC interface"
 +  },
 +  "common": {
