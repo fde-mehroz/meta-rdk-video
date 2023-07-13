@@ -14,7 +14,7 @@ new file mode 100644
 index 0000000..c0080e7
 --- /dev/null
 +++ b/interfaces/ITextToSpeech.h
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,123 @@
 +
 +#ifndef __ITEXTTOSPEECH_H
 +#define __ITEXTTOSPEECH_H
@@ -97,6 +97,7 @@ index 0000000..c0080e7
 +        virtual uint32_t SetFallbackText(const string scenario,const string value) = 0;
 +        virtual uint32_t SetAPIKey(const string apikey) = 0;
 +        virtual uint32_t SetPrimaryVolDuck(const uint8_t prim) = 0;
++        virtual uint32_t SetSpeechRate(const string speechRate) = 0;
 +
 +        // @brief Retrieve tts configuration attributes
 +        // @param config tts configuration

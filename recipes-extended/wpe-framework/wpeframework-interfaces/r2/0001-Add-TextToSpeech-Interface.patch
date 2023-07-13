@@ -13,7 +13,7 @@ Index: git/interfaces/ITextToSpeech.h
 ===================================================================
 --- /dev/null
 +++ git/interfaces/ITextToSpeech.h
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,123 @@
 +
 +#ifndef __ITEXTTOSPEECH_H
 +#define __ITEXTTOSPEECH_H
@@ -96,6 +96,7 @@ Index: git/interfaces/ITextToSpeech.h
 +        virtual uint32_t SetFallbackText(const string scenario,const string value) = 0;
 +        virtual uint32_t SetAPIKey(const string apikey) = 0;
 +        virtual uint32_t SetPrimaryVolDuck(const uint8_t prim) = 0;
++        virtual uint32_t SetSpeechRate(const string speechRate) = 0;
 +
 +        // @brief Retrieve tts configuration attributes
 +        // @param config tts configuration
@@ -136,14 +137,16 @@ Index: git/interfaces/ITextToSpeech.h
 +} // WPEFramework
 +
 +#endif //__ITEXTTOSPEECH_H
-Index: git/interfaces/Ids.h
-===================================================================
---- git.orig/interfaces/Ids.h
-+++ git/interfaces/Ids.h
-@@ -253,6 +253,8 @@ namespace Exchange {
++
+diff --git a/interfaces/Ids.h b/interfaces/Ids.h
+index 3a81624..64d6a89 100644
+--- a/interfaces/Ids.h
++++ b/interfaces/Ids.h
+@@ -293,6 +293,9 @@ namespace Exchange {
          ID_BROWSER_SCRIPTING,
          ID_BROWSER_COOKIEJAR,
          ID_BROWSER_COOKIEJAR_NOTIFICATION,
++
 +        ID_TEXT_TO_SPEECH,
 +        ID_TEXT_TO_SPEECH_NOTIFICATION,
      };
