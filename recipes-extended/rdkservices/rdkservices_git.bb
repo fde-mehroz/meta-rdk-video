@@ -27,8 +27,6 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            file://0001-rdkservices_cbcs_changes.patch \
            file://0001-RDK-41681-PR4013.patch \
            file://0002-Adding-Support-For-R4.patch \
-           ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://0003-Messenger_Plugin-Compilation-Fix-For-R4.patch', ' ', d)} \
-           ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://R4.2_DeviceInfo_compilation_error.patch', ' ', d)} \
           "
 
 # July 17 2023
@@ -68,7 +66,7 @@ PACKAGECONFIG ?= " \
     ${WPE_SNAPSHOT} \
     activitymonitor avinput continuewatching datacapture devicediagnostics \
     displaysettings framerate hdcpprofile hdmicec hdmiinput loggingpreferences \
-    messenger screencapture securityagent stateobserver \
+    screencapture securityagent stateobserver \
     systemservices timer userpreferences warehouse monitor locationsync texttospeech persistent_store airplayservice \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluetoothcontrol', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'opencdm',              'opencdmi', '', d)} \
@@ -82,12 +80,10 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'fireboltmediaplayer', 'fireboltmediaplayer', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'dlnasupport', ' dlna', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'flex2_rdk', ' hdmicecsource', ' ', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'messagecontrol', 'tracecontrol', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' messagecontrol ', ' tracecontrol messenger ', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systimemgr', 'systimemgrsupport', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm', 'controlservice voicecontrol remotecontrol remoteactionmapping', '', d)} \
 "
-
-PACKAGECONFIG_remove = " ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' tracecontrol', '', d)}"
 
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'rdkshell_disable_autostart', ' -DPLUGIN_RDKSHELL_AUTOSTART=false ', ' -DPLUGIN_RDKSHELL_AUTOSTART=true ', d)}"
 EXTRA_OECMAKE += "${@bb.utils.contains_any('DISTRO_FEATURES', 'rdkshell_ra second_form_factor', ' -DPLUGIN_RDKSHELL_AUTOSTART=true ', ' ', d)}"

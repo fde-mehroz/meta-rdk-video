@@ -19,6 +19,7 @@ SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch
            file://r4/Inetflix-api-revert.patch \
            file://r4/0101-IWatermark-Interface-In-R4.patch \
            file://0001-add-PersistLoadWatermark.patch \
+           file://r4/0007-RDK-IDeviceInfo-Changes.patch \
            "
 
 #
