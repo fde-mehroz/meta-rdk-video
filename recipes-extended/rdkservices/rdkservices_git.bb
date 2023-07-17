@@ -31,8 +31,8 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', 'file://R4.2_DeviceInfo_compilation_error.patch', ' ', d)} \
           "
 
-# July 13 2023
-SRCREV = "afcc94f63c836404587c6a8f59fc2b7876c7be9b"
+# July 17 2023
+SRCREV = "7924f48408efa31e9d7aef9aaf832f5dad4cc744"
 
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' -DUSE_THUNDER_R4=ON', '', d)}"
