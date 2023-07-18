@@ -183,6 +183,7 @@ inherit ${LOGGER}
 VSDK_UTILS_JSON_TO_HEADER ?= ""
 VSDK_UTILS_JSON_COMBINE   ?= ""
 
+SUPPORT_VOICE_DEST_HTTP   ?= "false"
 SUPPORT_VOICE_DEST_ALSA   ?= "false"
 
 export CTRLM_UTILS_JSON_TO_HEADER  = "${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm_voice_sdk', '${VSDK_UTILS_JSON_TO_HEADER}', '${S}/scripts/json_to_header.py', d)}"
@@ -198,6 +199,7 @@ CTRLM_CONFIG_CPC_ADD = "${S}/../ctrlm_config_cpc.add.json"
 CTRLM_CONFIG_CPC_SUB = "${S}/../ctrlm_config_cpc.sub.json"
 
 EXTRA_OECONF_append = " CTRLM_CONFIG_JSON_VSDK=${CTRLM_CONFIG_VSDK} CTRLM_CONFIG_JSON_CPC=${CTRLM_CONFIG_CPC} CTRLM_CONFIG_JSON_OEM_SUB=${CTRLM_CONFIG_OEM_SUB} CTRLM_CONFIG_JSON_OEM_ADD=${CTRLM_CONFIG_OEM_ADD} CTRLM_CONFIG_JSON_CPC_SUB=${CTRLM_CONFIG_CPC_SUB} CTRLM_CONFIG_JSON_CPC_ADD=${CTRLM_CONFIG_CPC_ADD}"
+EXTRA_OECONF_append = "${@ ' --enable-xrsr_http' if (d.getVar('SUPPORT_VOICE_DEST_HTTP', expand=False) == "true") else ''}"
 EXTRA_OECONF_append = "${@ ' --enable-xrsr_sdt' if (d.getVar('SUPPORT_VOICE_DEST_ALSA', expand=False) == "true") else ''}"
 
 DEPENDS_append   = "${@ ' virtual-mic' if (d.getVar('SUPPORT_VOICE_DEST_ALSA',   expand=False) == "true") else ''}"
