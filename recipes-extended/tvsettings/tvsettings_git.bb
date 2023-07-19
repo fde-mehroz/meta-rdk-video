@@ -19,6 +19,8 @@ inherit cmake systemd
 DEPENDS = "glib-2.0 iarmbus tvsettings-hal-headers virtual/tvsettings-hal hdmicec wpeframework wpeframework-clientlibraries tvsettings-plugins"
 RDEPENDS_${PN} += " devicesettings"
 
+EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' -DUSE_THUNDER_R4=ON', '', d)}"
+
 do_install() {
    install -d ${D}${includedir}/rdk/tv
    install -m 0644 ${S}/rdk-tv/include/*.hpp ${D}${includedir}/rdk/tv

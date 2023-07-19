@@ -1,0 +1,36 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 77b5aafd40..821c818751 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -59,10 +59,14 @@ find_package(WPEFramework REQUIRED)
+ if (WPEFRAMEWORK_FOUND)
+     message("WPEFRAMEWORK_FOUND = ${WPEFRAMEWORK_FOUND}")
+     include_directories(${CMAKE_CURRENT_SOURCE_DIR} PRIVATE ${WPEFRAMEWORK_INCLUDE_DIRS})
++else()
++if (USE_THUNDER_R4)
++       message(FATAL_ERROR "WPEFrameworkCOM not found")
+ else()
+     message(FATAL_ERROR "WPEFrameworkProtocols not found")
+ endif()
+ endif()
++endif()
+
+ if(CMAKE_QT5WEBKIT_JSBINDINGS)
+        message("CMAKE_QT5WEBKIT_JSBINDINGS set, require Qt5WebKit")
+diff --git a/cmake/FindWPEFramework.cmake b/cmake/FindWPEFramework.cmake
+index e39ba8469d..84902d3f5d 100644
+--- a/cmake/FindWPEFramework.cmake
++++ b/cmake/FindWPEFramework.cmake
+@@ -46,7 +46,11 @@ if(PC_WPEFRAMEWORK_FOUND)
+         NAMES plugins/plugins.h
+         HINTS ${PC_WPEFRAMEWORK_INCLUDEDIR} ${PC_WPEFRAMEWORK_INCLUDE_DIRS})
+
++if (USE_THUNDER_R4)
++       set(WPEFRAMEWORK_LIBS WPEFrameworkPlugins WPEFrameworkCore WPEFrameworkCOM WPEFrameworkSecurityUtil WPEFrameworkWebSocket)
++else()
+     set(WPEFRAMEWORK_LIBS WPEFrameworkPlugins WPEFrameworkCore WPEFrameworkTracing WPEFrameworkProtocols WPEFrameworkSecurityUtil)
++endif()
+     set(WPEFRAMEWORK_LIBRARY )
+     foreach(LIB ${WPEFRAMEWORK_LIBS})
+         find_library(WPEFRAMEWORK_LIBRARY_${LIB} NAMES ${LIB}
+

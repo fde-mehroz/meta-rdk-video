@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 inherit cmake pkgconfig
 
-DEPENDS += " wpeframework rfc tvsettings-hal-headers virtual/tvsettings-hal devicesettings jsoncpp boost"
+include recipes-extended/rdkservices/include/memory-check-support.inc
+
+DEPENDS += " wpeframework wpeframework-tools-native rfc tvsettings-hal-headers virtual/tvsettings-hal devicesettings jsoncpp boost"
 RDEPENDS_${PN} += " bash devicesettings"
 
 SRC_URI = "${CMF_RDK_COMPONENTS_ROOT_GIT}/opensource/tvsettings;protocol=${CMF_GIT_PROTOCOL};branch=${CMF_GIT_BRANCH};"

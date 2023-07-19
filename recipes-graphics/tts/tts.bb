@@ -18,6 +18,8 @@ S = "${WORKDIR}/git"
 
 CXXFLAGS += " -I${STAGING_INCDIR}/pxcore"
 
+EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' -DUSE_THUNDER_R4=ON', '', d)}"
+
 INSANE_SKIP_${PN} = "dev-so"
 INSANE_SKIP_${PN} += "ldflags"
 FILES_SOLIBSDEV = ""

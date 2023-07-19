@@ -18,6 +18,7 @@ AAMP_RELEASE_TAG_NAME ?= "5.6.1.0"
 SRC_URI = "${CMF_GIT_ROOT}/rdk/components/generic/aamp;protocol=${CMF_GIT_PROTOCOL};branch=${AAMP_RELEASE_TAG_NAME};nobranch=1;name=aamp"
 SRC_URI += "${@bb.utils.contains('AAMP_RELEASE_TAG_NAME', 'dev_sprint_22_1', 'file://0001-Updated-Find-JSC-include-path.patch', 'file://0001-Find-JSC-include-path.patch', d)}"
 SRC_URI += "file://aamp-opencdm-cbcs.patch"
+SRC_URI += "file://WPEFramework_Protocols_changed_R4.2.patch"
 
 S = "${WORKDIR}/git/"
 
@@ -32,6 +33,7 @@ require aamp-common.inc
 PACKAGECONFIG_append = " playready widevine clearkey"
 
 EXTRA_OECMAKE_remove_rpi = "${@bb.utils.contains('DISTRO_FEATURES', 'webkit', ' -DCMAKE_QT5WEBKIT_JSBINDINGS=1', '', d)}"
+EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' -DUSE_THUNDER_R4=ON', '', d)}"
 PACKAGES = "${PN} ${PN}-dev ${PN}-dbg"
 
 FILES_${PN} += "${libdir}/lib*.so"

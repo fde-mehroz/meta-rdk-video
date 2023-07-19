@@ -1,0 +1,55 @@
+From 2c79c05f9791e03838e8b979bf8bef4f895919a7 Mon Sep 17 00:00:00 2001
+From: Pierre Wielders <pierre@wielders.net>
+Date: Mon, 30 Aug 2021 11:15:11 +0200
+Subject: [PATCH] Merge pull request #705 from
+ Karthick-Somasundaresan/fix/lockup_in_fileobserver
+
+[FIX] FixeslLockup in FileObserver unregister call
+---
+ Source/core/CMakeLists.txt |  1 +
+ Source/core/FileObserver.h | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/Source/core/CMakeLists.txt b/Source/core/CMakeLists.txt
+index 0a2cbba3..5457838c 100644
+--- a/Source/core/CMakeLists.txt
++++ b/Source/core/CMakeLists.txt
+@@ -71,6 +71,7 @@ set(PUBLIC_HEADERS
+         Enumerate.h
+         Factory.h
+         FileSystem.h
++        FileObserver.h
+         Frame.h
+         IAction.h
+         IIterator.h
+diff --git a/Source/core/FileObserver.h b/Source/core/FileObserver.h
+index fab65cfd..40b09178 100644
+--- a/Source/core/FileObserver.h
++++ b/Source/core/FileObserver.h
+@@ -170,12 +170,22 @@ public:
+                 _observers.erase(loop);
+                 if (_files.size() == 0) {
+                     // This is the first entry, lets start monitoring
++                    _adminLock.Unlock();
+                     Core::ResourceMonitor::Instance().Unregister(*this);
+                 }
++                else {
++                    _adminLock.Unlock();
++                }
++            }
++            else {
++                _adminLock.Unlock();
+             }
+         }
++        else
++        {
++            _adminLock.Unlock();
++        }
+ 
+-        _adminLock.Unlock();
+     }
+ 
+ private:
+-- 
+2.34.1
+

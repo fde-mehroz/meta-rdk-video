@@ -1,0 +1,27 @@
+##########################################
+Date: Dec 20, 2021 1:41 AM
+From: d4723c06bddfca7cbd9f9327ed402dd2cc4b75a7 
+Subject: to generate WPEFRameworkProtocol pkgconfig
+Source: COMCAST
+License: GPLV2
+Upstream-Status: Pending
+Signed-off-by: LeenaSunthari <ldhana149@cable.comcast.com>
+##########################################
+
+
+
+Index: git/Source/protocols/CMakeLists.txt
+===================================================================
+--- git.orig/Source/protocols/CMakeLists.txt
++++ git/Source/protocols/CMakeLists.txt
+@@ -173,6 +173,10 @@ install(
+ 
+ InstallCMakeConfig(TARGETS ${TARGET})
+ 
++InstallPackageConfig(
++	        TARGETS ${TARGET}
++	        DESCRIPTION "Enable ease of development for Protocol support." )
++
+ #FIXME: This is messy, but it's the consequence of combining more independent libraries in one.
+ install(
+         FILES ${COM_INCLUDES} ../com/Module.h

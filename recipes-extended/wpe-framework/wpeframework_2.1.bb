@@ -1,4 +1,6 @@
 SUMMARY = "Thunder Framework"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=f1dffbfd5c2eb52e0302eb6296cc3711"
+
 require include/thunder.inc
 
 DEPENDS = "zlib wpeframework-tools-native rfc"
@@ -8,27 +10,32 @@ DEPENDS += "breakpad-wrapper"
 # Need gst-svp-ext which is an abstracting lib for metadata
 DEPENDS +=  "${@bb.utils.contains('DISTRO_FEATURES', 'rdk_svp', 'gst-svp-ext', '', d)}"
 
-SRC_URI += "file://0003-OCDM-increase-RPC-comm-timeout.patch \
+SRC_URI = "git://github.com/rdkcentral/Thunder.git;protocol=git;branch=R2;name=thunder"
+
+# Sep 29, 2022, 82d4791478934292f7260fef233b9743fa34d88e
+SRCREV_thunder = "${THUNDER_RELEASE_TAG_NAME}"
+
+SRC_URI += "file://r2/0003-OCDM-increase-RPC-comm-timeout.patch \
            file://wpeframework-init \
            file://wpeframework.service.in \
            file://WPEFramework.env \
-           file://0001-RDK-28534-Security-Agent-Utility-and-Logging.patch \
-           file://0001-RDK-30034-callsign.patch \
-           file://0004-Enable-BrowserConsoleLog-by-default.patch \
-           file://603.patch \
-           file://0001-Support-negative-numbers-with-write_config.patch \
-           file://LLAMA-2254_fix_netlink_buffer_size_error.patch \
-           file://0001-RDKTV-15393-clock_gettime.patch \
-           file://0005-DELIA-58939-Webprocess-crash.patch \
-           file://0001-Thunder_json_quoted_string_parsing_fix.patch \
-           file://0001-SERVICES-Starting-multiples-services-concurrently-mi.patch \
-           file://0001-DEADLOCK-Deadlock-prevention-by-locking-the-ServiceA.patch \
-           file://0001-DEADLOCK-Next-to-closing-the-deadlock-on-the-open-of.patch \
-           file://to_add_protocols_pkgconfig_sdk.patch \
-           file://0001-Merge-pull-request-705-from-Karthick-Somasundaresan-.patch \
-           file://0006-Increase-buffer-size-of-COMRPC-messages.patch \
-           file://0007-Make-size-type-of-Core-Frame-Text-configurable.patch \
-           file://0008-Fix-calculation-of-handled-size.patch \
+           file://r2/0001-RDK-28534-Security-Agent-Utility-and-Logging.patch \
+           file://r2/0001-RDK-30034-callsign.patch \
+           file://r2/0004-Enable-BrowserConsoleLog-by-default.patch \
+           file://r2/603.patch \
+           file://r2/0001-Support-negative-numbers-with-write_config.patch \
+           file://r2/LLAMA-2254_fix_netlink_buffer_size_error.patch \
+           file://r2/0001-RDKTV-15393-clock_gettime.patch \
+           file://r2/0005-DELIA-58939-Webprocess-crash.patch \
+           file://r2/0001-Thunder_json_quoted_string_parsing_fix.patch \
+           file://r2/0001-SERVICES-Starting-multiples-services-concurrently-mi.patch \
+           file://r2/0001-DEADLOCK-Deadlock-prevention-by-locking-the-ServiceA.patch \
+           file://r2/0001-DEADLOCK-Next-to-closing-the-deadlock-on-the-open-of.patch \
+           file://r2/to_add_protocols_pkgconfig_sdk.patch \
+           file://r2/0001-Merge-pull-request-705-from-Karthick-Somasundaresan-.patch \
+           file://r2/0006-Increase-buffer-size-of-COMRPC-messages.patch \
+           file://r2/0007-Make-size-type-of-Core-Frame-Text-configurable.patch \
+           file://r2/0008-Fix-calculation-of-handled-size.patch \
            "
 
 inherit systemd update-rc.d pythonnative

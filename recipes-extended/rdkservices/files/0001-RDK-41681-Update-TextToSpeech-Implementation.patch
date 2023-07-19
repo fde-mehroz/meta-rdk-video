@@ -9,6 +9,7 @@ Priority: P1
 Risks: None
 
 Signed-off-by: Vivek.A <vivek_arumugam@comcast.com>
+Signed-off-by: Karunakaran A <karunakaran_amirthalingam@comcast.com>
 ---
  TextToSpeech/CMakeLists.txt                 |   13 +-
  TextToSpeech/ITextToSpeech.h                |   56 -
@@ -23,7 +24,7 @@ Signed-off-by: Vivek.A <vivek_arumugam@comcast.com>
  delete mode 100644 TextToSpeech/ProxyStubs_TextToSpeech.cpp
 
 diff --git a/TextToSpeech/CMakeLists.txt b/TextToSpeech/CMakeLists.txt
-index a34192e7..34e6fd8a 100644
+index 4555b73e..300c3212 100644
 --- a/TextToSpeech/CMakeLists.txt
 +++ b/TextToSpeech/CMakeLists.txt
 @@ -13,7 +13,6 @@ add_library(${MODULE_NAME} SHARED
@@ -38,10 +39,10 @@ index a34192e7..34e6fd8a 100644
  list(APPEND CMAKE_MODULE_PATH
          "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
  
--find_package(GSTREAMER REQUIRED)
+-find_package(GStreamer REQUIRED)
 -
  find_package(Curl)
-+find_package(GSTREAMER REQUIRED)
++find_package(GStreamer REQUIRED)
 +find_package(${NAMESPACE}Plugins REQUIRED)
 +find_package(${NAMESPACE}Definitions REQUIRED)
  
@@ -1347,6 +1348,3 @@ index f136fb3e..9eb76afe 100644
  
  namespace WPEFramework {
  namespace Plugin {
--- 
-2.17.1
-
