@@ -9,7 +9,6 @@ DEPENDS = "wpeframework wpeframework-tools-native"
 SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch=R2;name=wpeframework-interfaces \
            file://0018-notifyclient-event-added.patch \
            file://0020-Adding-the-VoiceCommand-API-for-Netflix-plugin.patch \
-           file://0001-RDK-31882-Add-GstCaps-parsing-in-OCDM-wpeframework-interfaces.patch \
            file://0001-Add-IFocus-iface.patch \
            file://0001-Revert-Merge-pull-request-137-from-mikolaj-staworzyn.patch \
            file://0001-Extend-web-browser-interface-for-XRE-usecases.patch \
@@ -18,8 +17,8 @@ SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch
            file://0001-Add-TextToSpeech-Interface.patch \
            "
 
-# Sep 20, 2022
-SRCREV_wpeframework-interfaces = "79a56ec11905b1868665800097ff9d1b3609a09f"
+# Sep 29, 2022
+SRCREV_wpeframework-interfaces = "7547343f51e92ffd897e44f38d710336601135da"
 
 # ----------------------------------------------------------------------------
 
