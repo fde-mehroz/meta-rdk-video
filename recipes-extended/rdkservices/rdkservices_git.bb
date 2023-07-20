@@ -110,7 +110,7 @@ PACKAGECONFIG[framerate]            = "-DPLUGIN_FRAMERATE=ON,-DPLUGIN_FRAMERATE=
 PACKAGECONFIG[hdcpprofile]          = "-DPLUGIN_HDCPPROFILE=ON,-DPLUGIN_HDCPPROFILE=OFF,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
 PACKAGECONFIG[hdmicec]              = "-DPLUGIN_HDMICEC=ON,-DPLUGIN_HDMICEC=OFF,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
 PACKAGECONFIG[hdmicec2]             = "-DPLUGIN_HDMICEC2=ON,-DPLUGIN_HDMICEC2=OFF,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
-PACKAGECONFIG[hdmicecsink]          = "-DPLUGIN_HDMICECSINK=ON,,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
+PACKAGECONFIG[hdmicecsink]          = "-DPLUGIN_HDMICECSINK=ON,-DPLUGIN_HDMICECSINK=OFF,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
 PACKAGECONFIG[hdmicecsource]        = "-DPLUGIN_HDMICECSOURCE=ON,-DPLUGIN_HDMICECSOURCE=OFF,iarmbus iarmmgrs devicesettings hdmicec,iarmbus devicesettings hdmicec"
 PACKAGECONFIG[hdmiinput]            = "-DPLUGIN_HDMIINPUT=ON,-DPLUGIN_HDMIINPUT=OFF,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
 PACKAGECONFIG[ledcontrol]           = "-DPLUGIN_LEDCONTROL=ON,,iarmbus iarmmgrs devicesettings,iarmbus devicesettings"
