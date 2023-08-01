@@ -59,11 +59,10 @@ Index: git/interfaces/Ids.h
 ===================================================================
 --- git.orig/interfaces/Ids.h
 +++ git/interfaces/Ids.h
-@@ -243,6 +243,10 @@ namespace Exchange {
-         
- 	ID_WATERMARK,
-         ID_WATERMARK_NOTIFICATION,
-+
+@@ -287,6 +287,9 @@ namespace Exchange {
+         ID_DTV_COMPONENT_TAG_ITERATOR,
+         ID_DTV_TRANSPORT,
+
 +        ID_BROWSER_SCRIPTING,
 +        ID_BROWSER_COOKIEJAR,
 +        ID_BROWSER_COOKIEJAR_NOTIFICATION,

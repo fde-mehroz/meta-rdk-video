@@ -1,0 +1,40 @@
+Index: git/Source/CMakeLists.txt
+===================================================================
+--- git.orig/Source/CMakeLists.txt
++++ git/Source/CMakeLists.txt
+@@ -100,10 +100,6 @@ if(CRYPTALGO)
+     add_subdirectory(cryptalgo)
+ endif()
+ 
+-if(PROCESSCONTAINERS)
+-    add_subdirectory(processcontainers)
+-endif()
+-
+ if(WEBSOCKET)
+     add_subdirectory(websocket)
+ endif()
+@@ -120,6 +116,10 @@ if(WARNING_REPORTING)
+     add_subdirectory(warningreporting)
+ endif()
+ 
++if(PROCESSCONTAINERS)
++    add_subdirectory(processcontainers)
++endif()
++
+ if(PROFILER)
+     message(FATAL_ERROR "PROFILER option does not exist?")
+     set(PROFILER_INCLUDE_DIR "${ROOT}/Source/profiler")
+Index: git/Source/processcontainers/CMakeLists.txt
+===================================================================
+--- git.orig/Source/processcontainers/CMakeLists.txt
++++ git/Source/processcontainers/CMakeLists.txt
+@@ -61,6 +61,9 @@ set(PUBLIC_HEADERS
+ target_link_libraries(${TARGET}
+         PUBLIC
+         ${NAMESPACE}Core::${NAMESPACE}Core
++        ${NAMESPACE}Messaging::${NAMESPACE}Messaging
++        PRIVATE
++        CompileSettingsDebug::CompileSettingsDebug
+         )
+ 
+ set_target_properties(${TARGET} PROPERTIES

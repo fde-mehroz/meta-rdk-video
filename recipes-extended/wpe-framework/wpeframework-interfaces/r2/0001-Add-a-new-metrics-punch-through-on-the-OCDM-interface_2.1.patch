@@ -1,0 +1,46 @@
+From e5ec9199835d3a8eb813e6e5413703e0f39f714e Mon Sep 17 00:00:00 2001
+From: kkanag314 <krishnapriya_kanagaraj@comcast.com>
+Date: Thu, 14 Sep 2023 11:01:54 +0000
+Subject: [PATCH] Add a new metrics punch through on the OCDM framework
+
+---
+ interfaces/IDRM.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/interfaces/IDRM.h b/interfaces/IDRM.h
+index 62e3e59..5f8d1a1 100644
+--- a/interfaces/IDRM.h
++++ b/interfaces/IDRM.h
+@@ -198,6 +198,10 @@ namespace CDMi {
+ typedef enum {
+     CDMi_SUCCESS = 0,
+     CDMi_S_FALSE = 1,
++    CDMi_MORE_DATA_AVAILABLE = 2,
++    CDMi_INTERFACE_NOT_IMPLEMENTED = 3,
++    CDMi_BUFFER_TOO_SMALL = 4,
++    CDMi_INVALID_ACCESSOR = 0x80000001,
+     CDMi_KEYSYSTEM_NOT_SUPPORTED = 0x80000002,
+     CDMi_INVALID_SESSION = 0x80000003,
+     CDMi_INVALID_DECRYPT_BUFFER = 0x80000004,
+@@ -502,6 +506,18 @@ public:
+         = 0;
+ };
+ 
++struct IMediaSystemMetrics {
++    virtual ~IMediaSystemMetrics() = default;
++
++    virtual CDMi_RESULT Metrics (uint32_t& bufferLength, uint8_t buffer[]) const = 0;
++};
++
++struct IMediaSessionMetrics {
++    virtual ~IMediaSessionMetrics() = default;
++
++    virtual CDMi_RESULT Metrics (uint32_t& bufferLength, uint8_t buffer[]) const = 0;
++};
++
+ struct ISystemFactory {
+     virtual ~ISystemFactory() = default;
+     virtual IMediaKeys* Instance() = 0;
+-- 
+2.17.1
+

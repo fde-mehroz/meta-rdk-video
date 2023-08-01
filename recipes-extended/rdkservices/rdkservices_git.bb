@@ -21,16 +21,16 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            file://0001-Add-monitoring-of-cloned-callsigns.patch \
            file://rdkservices.ini \
            file://0001-RDKTV-11792-increase-retry-count.patch \
-           file://0001-SERXIONE-600-LocationSync-Network-check-timer.patch \
            file://0001-RDKTV-20749-Revert-Merge-pull-request-3336-from-npol.patch \
            file://0001-RDK-39924-Launch-Airplay-App-from-Airplay-icon-sel.patch \
            file://0001-rdkservices_cbcs_changes.patch \
            file://0001-RDK-41681-PR4013.patch \
            file://0002-Adding-Support-For-R4.patch \
+           file://0001-Add-a-new-metrics-punch-through-on-the-OCDM-framework-rdkservice.patch \
           "
 
-# Aug 02 2023
-SRCREV = "bd88c1be00b60ed1a515195b3619bd80b908906b"
+# Nov 28 2023
+SRCREV = "cc8b8a5d52f66f76e5d14a3d86613ca46f1419ca"
 
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' -DUSE_THUNDER_R4=ON', '', d)}"
@@ -67,7 +67,7 @@ PACKAGECONFIG ?= " \
     activitymonitor avinput continuewatching datacapture devicediagnostics \
     displaysettings framerate hdcpprofile hdmicec hdmiinput loggingpreferences \
     screencapture securityagent stateobserver \
-    systemservices timer userpreferences warehouse monitor locationsync texttospeech persistent_store airplayservice \
+    systemservices timer userpreferences warehouse monitor locationsync texttospeech persistent_store airplayservice messenger \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluetoothcontrol', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'opencdm',              'opencdmi', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'playready_nexus_svp',  'opencdmi_prnx_svp', '', d)} \
@@ -81,7 +81,7 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'fireboltmediaplayer', 'fireboltmediaplayer', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'dlnasupport', ' dlna', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'flex2_rdk', ' hdmicecsource', ' ', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' messagecontrol ', ' tracecontrol messenger ', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' messagecontrol ', ' tracecontrol ', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systimemgr', 'systimemgrsupport', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ctrlm', 'controlservice voicecontrol remotecontrol remoteactionmapping', '', d)} \
 "
@@ -183,6 +183,7 @@ MONITOR_PLUGIN_ARGS                ?= " \
 "
 
 EXTRA_OECMAKE += " \
+    -DPYTHON_EXECUTABLE=${STAGING_BINDIR_NATIVE}/python3-native/python3 \
     -DBUILD_REFERENCE=${SRCREV} \
     -DBUILD_SHARED_LIBS=ON \
     -DSECAPI_LIB=sec_api \

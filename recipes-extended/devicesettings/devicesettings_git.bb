@@ -16,8 +16,8 @@ SRC_URI = "${CMF_GIT_ROOT}/rdk/components/generic/devicesettings;protocol=${CMF_
 # hal, Note: we make this package machine specific since it uses a
 # machine HAL
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-DEPENDS="directfb iarmbus rdk-logger virtual/devicesettings-hal devicesettings-hal-headers safec-common-wrapper"
-RDEPENDS_${PN} += "directfb"
+DEPENDS="directfb iarmbus rdk-logger rfc virtual/devicesettings-hal devicesettings-hal-headers safec-common-wrapper"
+RDEPENDS_${PN} += "directfb rfc"
 DEPENDS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'safec', ' safec ', " ", d)}"
 
 S = "${WORKDIR}/git"
@@ -56,6 +56,10 @@ CFLAGS += "-DRDK_DSHAL_NAME="\""libds-hal.so.0\""""
 CFLAGS += " -DYOCTO_BUILD"
 CFLAGS += " -DDS_AUDIO_SETTINGS_PERSISTENCE"
 
+# added support for rfc
+CFLAGS += "-I${STAGING_INCDIR}/wdmp-c"
+CXXFLAGS += "-I${STAGING_INCDIR}/wdmp-c"
+LDFLAGS +="-lrfcapi"
 
 # Shared libs created by the RDK build aren't versioned, so we need
 # to force the .so files into the runtime package (and keep them

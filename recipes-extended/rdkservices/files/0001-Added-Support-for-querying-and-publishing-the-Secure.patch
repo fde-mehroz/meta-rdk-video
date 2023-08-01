@@ -13,11 +13,11 @@ Signed-off-by: Balaji Punnuru <balaji_punnuru@cable.comcast.com>
  4 files changed, 82 insertions(+)
 
 diff --git a/SystemServices/SystemServices.cpp b/SystemServices/SystemServices.cpp
-index b920b05..ecfc5bc 100644
+index 719619e6..837d9623 100644
 --- a/SystemServices/SystemServices.cpp
 +++ b/SystemServices/SystemServices.cpp
-@@ -45,6 +45,10 @@
- #include "libIARM.h"
+@@ -41,6 +41,10 @@
+ #include "UtilsIarm.h"
  #endif /* USE_IARMBUS || USE_IARM_BUS */
  
 +#ifdef ENABLE_SYSTIMEMGR_SUPPORT
@@ -27,7 +27,7 @@ index b920b05..ecfc5bc 100644
  #ifdef ENABLE_THERMAL_PROTECTION
  #include "thermonitor.h"
  #endif /* ENABLE_THERMAL_PROTECTION */
-@@ -231,6 +235,10 @@ namespace WPEFramework {
+@@ -329,6 +333,10 @@ namespace WPEFramework {
          void _thermMgrEventsHandler(const char *owner, IARM_EventId_t eventId,
                  void *data, size_t len);
  #endif /* ENABLE_THERMAL_PROTECTION */
@@ -38,7 +38,7 @@ index b920b05..ecfc5bc 100644
  
  #if defined(USE_IARMBUS) || defined(USE_IARM_BUS)
          static IARM_Result_t _SysModeChange(void *arg);
-@@ -298,6 +306,9 @@ namespace WPEFramework {
+@@ -394,6 +402,9 @@ namespace WPEFramework {
              registerMethod("setPowerState", &SystemServices::setDevicePowerState,
                      this);
  #endif /* HAS_API_SYSTEM && HAS_API_POWERSTATE */
@@ -47,8 +47,8 @@ index b920b05..ecfc5bc 100644
 +#endif// ENABLE_SYSTIMEMGR_SUPPORT
              registerMethod("setGzEnabled", &SystemServices::setGZEnabled, this);
              registerMethod("isGzEnabled", &SystemServices::isGZEnabled, this);
-             registerMethod("hasRebootBeenRequested",
-@@ -401,6 +412,9 @@ namespace WPEFramework {
+             registerMethod("getMode", &SystemServices::getMode, this);
+@@ -579,6 +590,9 @@ namespace WPEFramework {
  #ifdef ENABLE_THERMAL_PROTECTION
                  IARM_CHECK( IARM_Bus_RegisterEventHandler(IARM_BUS_PWRMGR_NAME, IARM_BUS_PWRMGR_EVENT_THERMAL_MODECHANGED, _thermMgrEventsHandler));
  #endif //ENABLE_THERMAL_PROTECTION
@@ -56,11 +56,11 @@ index b920b05..ecfc5bc 100644
 +                IARM_CHECK( IARM_Bus_RegisterEventHandler(IARM_BUS_SYSTIME_MGR_NAME, cTIMER_STATUS_UPDATE, _timerStatusEventHandler));
 +#endif// ENABLE_SYSTIMEMGR_SUPPORT
              }
-         }
+ 	    
+             RFC_ParamData_t param = {0};
+@@ -1899,6 +1913,18 @@ namespace WPEFramework {
  
-@@ -1734,6 +1748,18 @@ namespace WPEFramework {
-             sendNotify(EVT_ONTEMPERATURETHRESHOLDCHANGED, params);
-         }
+ #endif
  
 +#ifdef ENABLE_SYSTIMEMGR_SUPPORT
 +        void SystemServices::onTimeStatusChanged(string timequality,string timesource, string utctime)
@@ -75,9 +75,9 @@ index b920b05..ecfc5bc 100644
 +#endif// ENABLE_SYSTIMEMGR_SUPPORT
 +
          /***
-          * @brief : To set the Time to TZ_FILE.
-          * @param1[in]	: {"params":{"timeZone":"<string>"}}
-@@ -2513,6 +2539,24 @@ namespace WPEFramework {
+          * @brief Returns an array of strings containing the supported standby modes.
+          * Possible values are "LIGHT_SLEEP" and/or "DEEP_SLEEP".
+@@ -3599,6 +3625,24 @@ namespace WPEFramework {
              returnResponse(( E_OK == retVal)? true: false);
          }//end of getStateInfo
  
@@ -92,7 +92,7 @@ index b920b05..ecfc5bc 100644
 +              LOGWARN ("Query to get Timer Status Failed..\n");
 +              returnResponse(false);
 +           }
-+           
++
 +           response["TimeQuality"] = std::string(param.message,cTIMER_STATUS_MESSAGE_LENGTH);
 +           response["TimeSrc"] = std::string(param.timerSrc,cTIMER_STATUS_MESSAGE_LENGTH);
 +           response["Time"] = std::string(param.currentTime,cTIMER_STATUS_MESSAGE_LENGTH);
@@ -102,9 +102,9 @@ index b920b05..ecfc5bc 100644
  #if defined(HAS_API_SYSTEM) && defined(HAS_API_POWERSTATE)
          /***
           * @brief : To retrieve Device Power State.
-@@ -2953,6 +2997,25 @@ namespace WPEFramework {
-             }
+@@ -4315,6 +4359,25 @@ namespace WPEFramework {
          }
+ 
  #endif /* defined(USE_IARMBUS) || defined(USE_IARM_BUS) */
 +#ifdef ENABLE_SYSTIMEMGR_SUPPORT
 +        void _timerStatusEventHandler(const char *owner, IARM_EventId_t eventId,
@@ -129,12 +129,12 @@ index b920b05..ecfc5bc 100644
          /***
           * @brief : To handle the event of Thermal Level change. THe event is registered
 diff --git a/SystemServices/SystemServices.h b/SystemServices/SystemServices.h
-index 380f2cc..5690262 100644
+index 50a49e0e..2c14838c 100644
 --- a/SystemServices/SystemServices.h
 +++ b/SystemServices/SystemServices.h
-@@ -52,6 +52,10 @@
- #define EVT_ONMACADDRESSRETRIEVED         "onMacAddressesRetreived"
- #define EVT_ONREBOOTREQUEST               "onRebootRequest"
+@@ -71,6 +71,10 @@ using std::ofstream;
+ #define TERRITORYFILE                     "/opt/secure/persistent/System/Territory.txt"
+ 
  
 +#ifdef ENABLE_SYSTIMEMGR_SUPPORT
 +#define EVT_ONTIMESTATUSCHANGED           "onTimeStatusChanged"
@@ -143,32 +143,47 @@ index 380f2cc..5690262 100644
  namespace WPEFramework {
      namespace Plugin {
  
-@@ -138,6 +142,9 @@ namespace WPEFramework {
-                 void onFirmwareUpdateStateChange(int state);
+@@ -198,6 +202,9 @@ namespace WPEFramework {
+                 void onLogUpload(int newState);
                  void onTemperatureThresholdChanged(string thresholdType,
                          bool exceed, float temperature);
 +#ifdef ENABLE_SYSTIMEMGR_SUPPORT
 +                void onTimeStatusChanged(string timequality,string timesource, string utctime);
 +#endif// ENABLE_SYSTIMEMGR_SUPPORT
                  void onRebootRequest(string reason);
-                 /* Events : End */
- 
-@@ -211,6 +218,10 @@ namespace WPEFramework {
+                 void onFirmwarePendingReboot(int seconds); /* Event handler for Pending Reboot */
+ 		void onTerritoryChanged(string oldTerritory, string newTerritory, string oldRegion="", string newRegion="");
+@@ -218,6 +225,9 @@ namespace WPEFramework {
+                 uint32_t getDevicePowerState(const JsonObject& parameters,JsonObject& response);
                  uint32_t setDevicePowerState(const JsonObject& parameters,JsonObject& response);
  #endif /* HAS_API_SYSTEM && HAS_API_POWERSTATE */
- 
 +#ifdef ENABLE_SYSTIMEMGR_SUPPORT
 +                uint32_t getSystemTimeStatus(const JsonObject& parameters,JsonObject& response);
 +#endif// ENABLE_SYSTIMEMGR_SUPPORT
-+
-                 uint32_t isRebootRequested(const JsonObject& parameters,JsonObject& response);
                  uint32_t setGZEnabled(const JsonObject& parameters,JsonObject& response);
                  uint32_t isGZEnabled(const JsonObject& parameters,JsonObject& response);
+                 uint32_t getSystemVersions(const JsonObject& parameters, JsonObject& response);
+diff --git a/amlogic.cmake b/amlogic.cmake
+index 6d682a74..cb284c90 100644
+--- a/amlogic.cmake
++++ b/amlogic.cmake
+@@ -83,6 +83,11 @@ if (BUILD_ENABLE_THERMAL_PROTECTION)
+ add_definitions (-DBUILD_ENABLE_THERMAL_PROTECTION)
+    add_definitions (-DENABLE_THERMAL_PROTECTION)
+ endif()
++if (BUILD_ENABLE_SYSTIMEMGR_SUPPORT)
++    message("Building with SYSTIMEMGR_SUPPORT enabled")
++   add_definitions (-DENABLE_SYSTIMEMGR_SUPPORT)
++endif()
++
+ 
+ if (BUILD_ENABLE_DEVICE_MANUFACTURER_INFO)
+     message("Building with device manufacturer info")
 diff --git a/broadcom.cmake b/broadcom.cmake
-index 4722d3e..b62e848 100644
+index 80feae9f..c98dc5a0 100644
 --- a/broadcom.cmake
 +++ b/broadcom.cmake
-@@ -89,6 +89,10 @@ add_definitions (-DBUILD_ENABLE_THERMAL_PROTECTION)
+@@ -94,6 +94,10 @@ add_definitions (-DBUILD_ENABLE_THERMAL_PROTECTION)
     add_definitions (-DENABLE_THERMAL_PROTECTION)
  endif()
  
@@ -180,10 +195,10 @@ index 4722d3e..b62e848 100644
      message("Building with SCREENCAP_SVP_ENABLED")
      add_definitions (-DSCREENCAP_SVP_ENABLED)
 diff --git a/realtek.cmake b/realtek.cmake
-index 41d5978..016fc1c 100644
+index 0de092f1..db825da1 100644
 --- a/realtek.cmake
 +++ b/realtek.cmake
-@@ -76,6 +76,10 @@ if (BUILD_ENABLE_THERMAL_PROTECTION)
+@@ -83,6 +83,10 @@ if (BUILD_ENABLE_THERMAL_PROTECTION)
  add_definitions (-DBUILD_ENABLE_THERMAL_PROTECTION)
     add_definitions (-DENABLE_THERMAL_PROTECTION)
  endif()
@@ -194,22 +209,3 @@ index 41d5978..016fc1c 100644
  
  if (BUILD_ENABLE_DEVICE_MANUFACTURER_INFO)
      message("Building with device manufacturer info")
-diff --git a/amlogic.cmake b/amlogic.cmake
-index 813bddb..db84fb3 100644
---- a/amlogic.cmake
-+++ b/amlogic.cmake
-@@ -76,6 +76,11 @@ if (BUILD_ENABLE_THERMAL_PROTECTION)
- add_definitions (-DBUILD_ENABLE_THERMAL_PROTECTION)
-    add_definitions (-DENABLE_THERMAL_PROTECTION)
- endif()
-+if (BUILD_ENABLE_SYSTIMEMGR_SUPPORT)
-+    message("Building with SYSTIMEMGR_SUPPORT enabled")
-+   add_definitions (-DENABLE_SYSTIMEMGR_SUPPORT)
-+endif()
-+
- 
- if (BUILD_ENABLE_DEVICE_MANUFACTURER_INFO)
-     message("Building with device manufacturer info")
--- 
-2.24.0
-

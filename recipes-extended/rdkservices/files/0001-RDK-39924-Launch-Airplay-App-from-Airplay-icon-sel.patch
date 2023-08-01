@@ -9,6 +9,7 @@ Risks: None
 
 Signed-off-by: rgangi643 <ramakrishna_gangisetty@comcast.com>
 ---
+ AirplayService/AirplayService.conf.in    |   4 +
  AirplayService/AirplayService.config     |   7 +
  AirplayService/AirplayService.cpp        | 228 +++++++++++++++++++++++
  AirplayService/AirplayService.h          |  69 +++++++
@@ -32,6 +33,16 @@ Signed-off-by: rgangi643 <ramakrishna_gangisetty@comcast.com>
  create mode 100644 AirplayService/Module.h
  create mode 100644 AirplayService/README.md
 
+diff --git a/AirplayService/AirplayService.conf.in b/AirplayService/AirplayService.conf.in
+new file mode 100644
+index 00000000..a4891270
+--- /dev/null
++++ b/AirplayService/AirplayService.conf.in
+@@ -0,0 +1,4 @@
++precondition = ["Platform"]
++callsign = "org.rdk.AirplayService"
++autostart = "false"
++startuporder = "@PLUGIN_AIRPLAYSERVICE_STARTUPORDER@"
 diff --git a/AirplayService/AirplayService.config b/AirplayService/AirplayService.config
 new file mode 100644
 index 00000000..034cb7b7

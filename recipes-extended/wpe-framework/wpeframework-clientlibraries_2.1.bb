@@ -15,10 +15,13 @@ SRC_URI = "git://github.com/rdkcentral/ThunderClientLibraries.git;protocol=git;b
            file://r2/0001-SecurityUtilityApp-input-args-support.patch \
            file://r2/0001-OCDM-enhancement-for-BCOM-ocdm-adapter.patch \
            file://0001-OCDM-enhancement-for-rdk-ocdm-adapter.patch \
+           file://0001-fixing-netflix-ocdm-playback-failure.patch \
+           file://r2//R2_compilation_error_Hash.patch \
+           file://r2/0001-Add-a-new-metrics-punch-through-on-the-OCDM-framework_2.1.patch \
            "
 
-# Sep 29, 2022
-SRCREV_wpeframework-clientlibraries = "adf82a27efed27ab7bc4208b6f9579f2dcc86a71"
+# Sep 11, 2023
+SRCREV_wpeframework-clientlibraries = "${THUNDER_RELEASE_TAG_NAME}"
 
 # ----------------------------------------------------------------------------
 

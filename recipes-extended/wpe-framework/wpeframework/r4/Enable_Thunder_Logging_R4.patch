@@ -1,0 +1,78 @@
+Index: git/Source/WPEFramework/WPEFramework.conf.in
+===================================================================
+--- git.orig/Source/WPEFramework/WPEFramework.conf.in
++++ git/Source/WPEFramework/WPEFramework.conf.in
+@@ -75,25 +75,70 @@ if boolean('@MESSAGING@'):
+ 
+   __notification = {
+        "category" : "Notification",
+-       "enabled" : False
++       "enabled" : True
+       }
+-  
++
++  __startup = {
++       "category" : "Startup",
++       "enabled" : True
++      }
++
++  __shutdown = {
++       "category" : "Shutdown",
++       "enabled" : True
++      }
++
++  __error = {
++       "category" : "Error",
++       "enabled" : True
++      }
++
++  __parsingError = {
++       "category" : "ParsingError",
++       "enabled" : True
++      }
++
++  __crash = {
++       "category" : "Crash",
++       "enabled" : True
++      }
++
+   __fatal = {
+        "category" : "Fatal",
+        "enabled" : True
+       }
+-  
++
+   __logging_settings = []
+   __logging_settings.append(__notification)
++  __logging_settings.append(__startup)
++  __logging_settings.append(__shutdown)
++  __logging_settings.append(__error)
++  __logging_settings.append(__parsingError)
++  __logging_settings.append(__crash)
++  __logging_settings.append(__fatal)
+   
+   __logging = JSON()
+   __logging.add("abbreviated", True)
+   __logging.add("settings", __logging_settings)
+   
+   messaging.add("logging", __logging)
++
++  __info= {
++       "category" : "Information",
++       "module" : "Plugin_LocationSync",
++       "enabled" : True
++      }
+   
++  __warn= {
++       "category" : "Warning",
++       "enabled" : True
++      }
++
+   __tracing_settings = []
+   __tracing_settings.append(__fatal)
++  __tracing_settings.append(__error)
++  __tracing_settings.append(__warn)
++  __tracing_settings.append(__info)
+   
+   __tracing = JSON()
+   __tracing.add("settings", __tracing_settings)

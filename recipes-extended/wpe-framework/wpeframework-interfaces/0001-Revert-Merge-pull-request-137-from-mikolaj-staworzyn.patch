@@ -41,13 +41,13 @@ index 852e98e..9c7ee91 100644
 @@ -15,17 +15,14 @@
  # See the License for the specific language governing permissions and
  # limitations under the License.
- 
+
 +cmake_minimum_required(VERSION 3.7.2)
 +
  project(Definitions)
- 
+
  set(Target ${NAMESPACE}Definitions)
- 
+
 -separate_arguments(JSONRPC_PATTERNS)
 -list(TRANSFORM JSONRPC_PATTERNS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/../jsonrpc/")
 -file(GLOB JSON_FILE ${JSONRPC_PATTERNS})
@@ -57,28 +57,23 @@ index 852e98e..9c7ee91 100644
 -file(GLOB INTERFACE_FILE ${INTERFACES_PATTERNS})
 +file(GLOB JSON_FILE      "${CMAKE_CURRENT_SOURCE_DIR}/../jsonrpc/*.json")
 +file(GLOB INTERFACE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../interfaces/I*.h")
- 
+
  set(PUBLIC_HEADERS "definitions.h")
- 
+
 diff --git a/interfaces/CMakeLists.txt b/interfaces/CMakeLists.txt
-index ea3ad85..ec4e3e1 100644
+index 0cbef6b..85fdef5 100644
 --- a/interfaces/CMakeLists.txt
 +++ b/interfaces/CMakeLists.txt
-@@ -21,12 +21,10 @@ project(Interfaces)
- 
- set(TargetMarshalling ${NAMESPACE}Marshallings)
- 
+@@ -28,11 +28,9 @@ if(NOT GENERATOR_SEARCH_PATH)
+     set(GENERATOR_SEARCH_PATH ${CMAKE_SYSROOT}${CMAKE_INSTALL_PREFIX}/include/${NAMESPACE})
+ endif()
+
 -separate_arguments(INTERFACES_PATTERNS)
 -file(GLOB INTERFACES_HEADERS ${INTERFACES_PATTERNS})
 -
- set(GENERATOR_SEARCH_PATH ${CMAKE_SYSROOT}${CMAKE_INSTALL_PREFIX}/include/${NAMESPACE})
 -ProxyStubGenerator(INPUT "${INTERFACES_HEADERS}" OUTDIR "${CMAKE_CURRENT_BINARY_DIR}/generated" INCLUDE_PATH ${GENERATOR_SEARCH_PATH})
 +ProxyStubGenerator(INPUT "${CMAKE_CURRENT_SOURCE_DIR}" OUTDIR "${CMAKE_CURRENT_BINARY_DIR}/generated" INCLUDE_PATH ${GENERATOR_SEARCH_PATH})
- 
+
 +file(GLOB INTERFACES_HEADERS I*.h)
  file(GLOB JSON_HEADERS json/*.h)
  list(APPEND INTERFACES_HEADERS Module.h)
- 
--- 
-2.25.1
-

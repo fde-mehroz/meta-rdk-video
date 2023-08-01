@@ -13,11 +13,9 @@ RDEPENDS_${PN} += "gst-plugins-rdk-aamp devicesettings"
 
 NO_RECOMMENDATIONS = "1"
 
-AAMP_RELEASE_TAG_NAME ?= "5.7.1.0"
+AAMP_RELEASE_TAG_NAME ?= "5.11.1.0"
 
 SRC_URI = "${CMF_GIT_ROOT}/rdk/components/generic/aamp;protocol=${CMF_GIT_PROTOCOL};branch=${AAMP_RELEASE_TAG_NAME};nobranch=1;name=aamp"
-SRC_URI += "file://aamp-opencdm-cbcs.patch"
-SRC_URI += "file://WPEFramework_Protocols_changed_R4.2.patch"
 
 S = "${WORKDIR}/git/"
 

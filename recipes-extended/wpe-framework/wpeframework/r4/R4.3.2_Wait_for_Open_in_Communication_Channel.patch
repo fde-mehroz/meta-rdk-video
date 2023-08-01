@@ -7,7 +7,7 @@ Index: git/Source/websocket/JSONRPCLink.h
  				uint32_t Initialize()
  				{
 -					return (Open(0));
-+					return (Open(1000));
++					return (Open(2000));
  				}
  				void Deinitialize()
  				{

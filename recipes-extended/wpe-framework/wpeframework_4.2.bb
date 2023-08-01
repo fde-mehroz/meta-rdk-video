@@ -35,6 +35,10 @@ SRC_URI += "file://r4/0001-RDK-28534-Security-Agent-Utility-and-Logging.patch \
             file://r4/wpeframework_added_optimization_flag_improvement.patch \
             file://r4/DELIA-56519_wpeframework_fix_R4.patch \
             file://r4/R4.3.2_Wait_for_Open_in_Communication_Channel.patch \
+            file://r4/RDKTV-24021.patch \
+            file://r4/ONEM-31782_R4.patch \
+            file://r4/linking_messaging_library.patch \
+            file://r4/Enable_Thunder_Logging_R4.patch \
             "
 
 inherit systemd update-rc.d pythonnative
@@ -54,6 +58,9 @@ PACKAGECONFIG ?= " \
     "
 
 PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'DOBBY_CONTAINERS','processcontainers processcontainers_dobby', '',d)}"
+
+PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'thunder_startup_services', 'com pluginactivator', '', d)}"
+PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'wpeframework_systemd_notify', 'sdnotify', '', d)}"
 
 # Buildtype
 # Maybe we need to couple this to a Yocto feature
@@ -78,6 +85,12 @@ PACKAGECONFIG[processcontainers_dobby]    = "-DPROCESSCONTAINERS_DOBBY=ON,,dobby
 PACKAGECONFIG[websource]       = "-DPLUGIN_WEBSERVER=ON,,"
 PACKAGECONFIG[webkitbrowser]   = "-DPLUGIN_WEBKITBROWSER=ON,,"
 PACKAGECONFIG[websocket]       = "-DWEBSOCKET=ON,,"
+
+PACKAGECONFIG[com] = "-DCOM=ON,,,"
+PACKAGECONFIG[pluginactivator] = "-DBUILD_PLUGIN_ACTIVATOR=ON,,,"
+PACKAGECONFIG[sdnotify] = ",,systemd,"
+
+SRC_URI += "${@bb.utils.contains('PACKAGECONFIG', 'sdnotify', 'file://wpeframework-sd_notify.patch ', '', d)}"
 
 # FIXME, determine this a little smarter
 # Provision event is required for libprovision and provision plugin
@@ -110,13 +123,13 @@ EXTRA_OECMAKE += " \
     -DPYTHON_EXECUTABLE=${STAGING_BINDIR_NATIVE}/python3-native/python3 \
     -DIDLE_TIME=${WPEFRAMEWORK_IDLE_TIME} \
     -DTHREADPOOL_COUNT=${WPEFRAMEWORK_THREADPOOL_COUNT} \
-    -DEXCEPTION_CATCHING=ON \
-    -DWARNING_REPORTING=ON \
     -DHIDE_NON_EXTERNAL_SYMBOLS=OFF \
     -DEXIT_REASONS=${WPEFRAMEWORK_EXIT_REASONS} \
     -DMESSAGING=ON \
     -DUMASK=001 \
 "
+
+EXTRA_OECMAKE += " -DLEGACY_CONFIG_GENERATOR=OFF"
 
 do_install_append() {
     if ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "true", "false", d)}
@@ -138,6 +151,12 @@ do_install_append() {
 
     install -d ${D}${sysconfdir}/wpeframework
     install -m 0644 ${WORKDIR}/WPEFramework.env ${D}${sysconfdir}/wpeframework
+}
+
+do_install_append() {
+    if [ "${@bb.utils.contains('PACKAGECONFIG', 'sdnotify', 'true', 'false', d)}" = "true" ]; then
+        sed -i -e 's/\[Service\]/\[Service\]\nType=notify/' ${D}${systemd_system_unitdir}/wpeframework.service
+    fi
 }
 
 SYSTEMD_SERVICE_${PN} = "wpeframework.service"

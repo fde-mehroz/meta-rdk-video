@@ -44,6 +44,7 @@ do_install() {
     install -d ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/ctrlm_vendor_network_factory.h ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/ctrlm_voice_packet_analysis.h ${D}${includedir}/ctrlm_private
+    install -m 644 ${S}/src/ctrlm_log.h ${D}${includedir}/ctrlm_private
 
     # Authorization Support
     install -m 644 ${S}/src/auth/ctrlm_auth.h ${D}${includedir}/ctrlm_private
@@ -53,7 +54,7 @@ do_install() {
     install -m 644 ${S}/src/irdb/ctrlm_irdb_factory.h ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/irdb/ctrlm_irdb.h ${D}${includedir}
     install -m 644 ${S}/src/irdb/ctrlm_irdb_stub.h ${D}${includedir}/ctrlm_private
-    install -m 644 ${S}/src/irdb/ipc/ctrlm_irdb_ipc.h ${D}${includedir}
+    install -m 644 ${S}/src/ipc/ctrlm_ipc_iarm.h ${D}${includedir}
     install -m 644 ${S}/src/irdb/ipc/ctrlm_irdb_ipc_iarm_thunder.h ${D}${includedir}/ctrlm_private
 
     # Network Support
@@ -83,6 +84,7 @@ do_install() {
     install -m 644 ${S}/src/telemetry/ctrlm_telemetry_markers.h ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/thunder/ctrlm_thunder_plugin.h ${D}${includedir}/ctrlm_private
     install -m 644 ${S}/src/thunder/ctrlm_thunder_controller.h ${D}${includedir}/ctrlm_private
+    install -m 644 ${S}/src/ipc/ctrlm_rcp_ipc_iarm_thunder.h ${D}${includedir}/ctrlm_private
 }
 
 ALLOW_EMPTY_${PN} = "1"

@@ -19,6 +19,8 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/git/tvmgr-plugins"
 CXXFLAGS_append = " -I${STAGING_INCDIR}/WPEFramework"
 
+EXTRA_OECMAKE += " -DPYTHON_EXECUTABLE=${STAGING_BINDIR_NATIVE}/python3-native/python3"
+
 INCLUDE_DIRS = " \
     -I${PKG_CONFIG_SYSROOT_DIR}/usr/include/WPEFramework/ \
     -I${PKG_CONFIG_SYSROOT_DIR}/usr/include/WPEFramework/websockets/ \

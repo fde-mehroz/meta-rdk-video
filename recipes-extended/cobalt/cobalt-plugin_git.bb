@@ -6,7 +6,7 @@ require starboard_revision.inc
 
 TOOLCHAIN = "gcc"
 
-SRC_URI = "${STARBOARD_SRC_URI};protocol=${CMF_GIT_PROTOCOL};branch=master"
+SRC_URI = "${STARBOARD_SRC_URI};protocol=${CMF_GIT_PROTOCOL};nobranch=1"
 
 SRCREV = "${STARBOARD_SRCREV}"
 
@@ -28,13 +28,11 @@ PACKAGECONFIG[evegreencompatible]  = "-DPLUGIN_COBALT_EVEGREEN_COMPATIBLE=ON,-DP
 PACKAGECONFIG[libcobalt]  = "-DPLUGIN_COBALT_EVEGREEN_LITE=OFF,,libcobalt"
 
 def get_cobalt_config(d):
-    if bb.utils.contains('DISTRO_FEATURES', 'libcobalt-rdm morty', True, False, d):
+    if bb.utils.contains_any('DISTRO_FEATURES', ['libcobalt-rdm', 'libcobalt', 'morty'], True, False, d):
        return 'libcobalt'
     if bb.utils.contains('DISTRO_FEATURES', 'cobalt-evergreen-full', True, False, d):
        return 'evegreencompatible'
-    if bb.utils.contains('DISTRO_FEATURES', 'cobalt_enable_evergreen_lite', True, False, d):
-       return 'evegreencompatible evegreenlite'
-    return 'libcobalt'
+    return 'evegreencompatible evegreenlite'
 
 PACKAGECONFIG_append = " ${@get_cobalt_config(d)}"
 
@@ -43,6 +41,19 @@ EXTRA_OECMAKE += " \
     -DBUILD_SHARED_LIBS=ON \
     -DPLUGIN_COBALT_CLIENTIDENTIFIER="${COBALT_CLIENTIDENTIFIER}" \
     -DPLUGIN_COBALT_PERSISTENTPATHPOSTFIX="${COBALT_PERSISTENTPATHPOSTFIX}" \
+"
+
+def define_cobalt_properties(d, proplist):
+    result = ''
+    for prop_name in proplist.split():
+        prop_name = 'PLUGIN_COBALT_PROP_' + prop_name
+        prop_val = d.getVar(prop_name, True)
+        if prop_val and prop_val != '':
+           result += ''.join(['-D',prop_name,'=',prop_val]) + ' '
+    return result
+
+EXTRA_OECMAKE += " \
+    ${@define_cobalt_properties(d,'MODELNAME MODELYEAR INTEGRATORNAME BRANDNAME FIRMWAREVERSION CHIPSETMODELNUMBER DEVICETYPE')} \
 "
 
 FILES_SOLIBSDEV = ""

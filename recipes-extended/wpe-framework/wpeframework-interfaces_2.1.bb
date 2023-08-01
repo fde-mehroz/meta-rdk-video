@@ -9,17 +9,17 @@ DEPENDS = "wpeframework wpeframework-tools-native"
 SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch=R2;name=wpeframework-interfaces \
            file://0018-notifyclient-event-added.patch \
            file://0020-Adding-the-VoiceCommand-API-for-Netflix-plugin.patch \
-           file://0001-Add-IFocus-iface.patch \
            file://0001-Revert-Merge-pull-request-137-from-mikolaj-staworzyn.patch \
            file://0001-Extend-web-browser-interface-for-XRE-usecases.patch \
-           file://r2/0001-RDK-37042-Add-interfaces-for-Airplay-Plugin.patch \
            file://r2/0001-RDK-40478-Run-AirplayDaemon-as-thunder-plugin.patch \
-           file://r2/0001-Add-TextToSpeech-Interface.patch \
            file://0001-add-PersistLoadWatermark.patch \
+           file://r2/0110-OMWAPPI-910-Increase-subsamples-limit-for-4k-content_new.patch \
+           file://r2/hdrtypes_displayinfo_R2.patch \
+           file://r2/0001-Add-a-new-metrics-punch-through-on-the-OCDM-interface_2.1.patch \
            "
 
-# Sep 29, 2022
-SRCREV_wpeframework-interfaces = "7547343f51e92ffd897e44f38d710336601135da"
+# Sep 11, 2023
+SRCREV_wpeframework-interfaces = "${THUNDER_RELEASE_TAG_NAME}"
 
 # ----------------------------------------------------------------------------
 

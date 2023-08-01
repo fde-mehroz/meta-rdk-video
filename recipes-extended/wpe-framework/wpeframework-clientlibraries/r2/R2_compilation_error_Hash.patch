@@ -1,0 +1,13 @@
+diff --git a/Source/cryptography/implementation/OpenSSL/Hash.cpp b/Source/cryptography/implementation/OpenSSL/Hash.cpp
+index bfd81d6..6a4cd44 100644
+--- a/Source/cryptography/implementation/OpenSSL/Hash.cpp
++++ b/Source/cryptography/implementation/OpenSSL/Hash.cpp
+@@ -80,7 +80,7 @@ namespace Operation {
+             return (EVP_DigestUpdate(ctx, d, cnt));
+         }
+         static int Final(EVP_MD_CTX* ctx, unsigned char* sig, size_t* siglen) {
+-            uint32_t siglen32 = 0
++            uint32_t siglen32 = 0;
+             int rv = EVP_DigestFinal(ctx, sig, &siglen32);
+             (*siglen) = siglen32;
+             return (rv);

@@ -1,0 +1,340 @@
+From 34c42740270e0d6cb519a28724a3e6e8b89101ad Mon Sep 17 00:00:00 2001
+From: Sergey Borushevsky <Sergey_Borushevsky2@cable.comcast.com>
+Date: Sat, 19 Jun 2021 17:45:04 +0000
+Subject: RDK-39525 - Updated deps for Thunder plugins.
+Source: COMCAST
+Upstream-Status: N/A
+Signed-off-by: Sergey Borushevsky <Sergey_Borushevsky2@cable.comcast.com>
+
+diff -upr a/systemd/system/wpeframework-authservice.service b/systemd/system/wpeframework-authservice.service
+--- a/systemd/system/wpeframework-authservice.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-authservice.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework AuthService Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service wpeframework-network.service
++Requires=wpeframework.service wpeframework-network.service iarmbusd.service
++After=wpeframework.service wpeframework-network.service iarmbusd.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-avcast.service b/systemd/system/wpeframework-avcast.service
+--- a/systemd/system/wpeframework-avcast.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-avcast.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework AVCast Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service wpeframework-authservice.service avahi-daemon.service
++After==wpeframework.service wpeframework-authservice.service avahi-daemon.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-controlsettings.service b/systemd/system/wpeframework-controlsettings.service
+--- a/systemd/system/wpeframework-controlsettings.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-controlsettings.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework ControlSettings Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service pqserver.service
++After=wpeframework.service iarmbusd.service dsmgr.service pqserver.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-deviceappmanager.service b/systemd/system/wpeframework-deviceappmanager.service
+--- a/systemd/system/wpeframework-deviceappmanager.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-deviceappmanager.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,6 +1,6 @@
+ [Unit]
+ Description=WPEFramework DeviceAppManager Initialiser
+-Requires=wpeframework.service
++Requires=wpeframework.service wpeframework-devicebridge.service
+ After=wpeframework.service wpeframework-devicebridge.service
+ [Service]
+ Type=oneshot
+diff -upr a/systemd/system/wpeframework-deviceinfo.service b/systemd/system/wpeframework-deviceinfo.service
+--- a/systemd/system/wpeframework-deviceinfo.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-deviceinfo.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework DeviceInfo Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service
++After=wpeframework.service iarmbusd.service dsmgr.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-deviceprovisioning.service b/systemd/system/wpeframework-deviceprovisioning.service
+--- a/systemd/system/wpeframework-deviceprovisioning.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-deviceprovisioning.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework DeviceProvisioning Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service wpeframework.service iarmbusd.service pwrmgr.service lighttpd.service
++After=wpeframework.service wpeframework-authservice.service iarmbusd.service pwrmgr.service lighttpd.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-displayinfo.service b/systemd/system/wpeframework-displayinfo.service
+--- a/systemd/system/wpeframework-displayinfo.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-displayinfo.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework DisplayInfo Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service
++After=wpeframework.service iarmbusd.service dsmgr.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-displaysettings.service b/systemd/system/wpeframework-displaysettings.service
+--- a/systemd/system/wpeframework-displaysettings.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-displaysettings.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework DisplaySettings Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service wpeframework-hdmicecsink.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service pwrmgr.service pqserver.service thunder-hdmicecsink.service
++After=wpeframework.service iarmbusd.service dsmgr.service pwrmgr.service pqserver.service thunder-hdmicecsink.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-frontpanel.service b/systemd/system/wpeframework-frontpanel.service
+--- a/systemd/system/wpeframework-frontpanel.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-frontpanel.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework FrontPanel Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service pwrmgr.service
++After=wpeframework.service iarmbusd.service dsmgr.service pwrmgr.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-hdcpprofile.service b/systemd/system/wpeframework-hdcpprofile.service
+--- a/systemd/system/wpeframework-hdcpprofile.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-hdcpprofile.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework HdcpProfile Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service
++After=wpeframework.service iarmbusd.service dsmgr.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-hdmicec_2.service b/systemd/system/wpeframework-hdmicec_2.service
+--- a/systemd/system/wpeframework-hdmicec_2.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-hdmicec_2.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework HdmiCec_2 Initialiser
+ Requires=wpeframework.service
+-After=wpeframework.service
++After=wpeframework.service iarmbusd.service dsmgr.service cecdaemon.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-hdmicecsink.service b/systemd/system/wpeframework-hdmicecsink.service
+--- a/systemd/system/wpeframework-hdmicecsink.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-hdmicecsink.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework HdmiCecSink Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service pwrmgr.service cecdaemon.service
++After=wpeframework.service iarmbusd.service dsmgr.service pwrmgr.service cecdaemon.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-hdmiinput.service b/systemd/system/wpeframework-hdmiinput.service
+--- a/systemd/system/wpeframework-hdmiinput.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-hdmiinput.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework HdmiInput Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service
++After=wpeframework.service iarmbusd.service dsmgr.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-maintenancemanager.service b/systemd/system/wpeframework-maintenancemanager.service
+--- a/systemd/system/wpeframework-maintenancemanager.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-maintenancemanager.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework MaintenanceManager Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service wpeframework-authservice.service wpeframework-network.service
++Requires=wpeframework.service iarmbusd.service mfrmgr.service pwrmgr.service deepsleepmgr.service wpeframework-network.service wpeframework-authservice.service
++After=wpeframework.service iarmbusd.service mfrmgr.service pwrmgr.service deepsleepmgr.service wpeframework-network.service wpeframework-authservice.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-mediasystem.service b/systemd/system/wpeframework-mediasystem.service
+--- a/systemd/system/wpeframework-mediasystem.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-mediasystem.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework MediaSystem Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service wpeframework-authservice.service mediarite.service
++After=wpeframework.service wpeframework-authservice.service mediarite.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-network.service b/systemd/system/wpeframework-network.service
+--- a/systemd/system/wpeframework-network.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-network.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework Network Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service netsrvmgr.service
++After=wpeframework.service iarmbusd.service netsrvmgr.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-ocdm.service b/systemd/system/wpeframework-ocdm.service
+--- a/systemd/system/wpeframework-ocdm.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-ocdm.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,6 +1,6 @@
+ [Unit]
+ Description=WPEFramework OCDM Initialiser
+-Requires=wpeframework.service
++Requires=wpeframework.service wpeframework-deviceprovisioning.service
+ After=wpeframework.service wpeframework-deviceprovisioning.service
+ [Service]
+ Type=oneshot
+diff -upr a/systemd/system/wpeframework-ocicontainer.service b/systemd/system/wpeframework-ocicontainer.service
+--- a/systemd/system/wpeframework-ocicontainer.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-ocicontainer.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework OCIContainer Initialiser
+ Requires=wpeframework.service
+-After=wpeframework.service
++After=wpeframework.service dobby.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-playerinfo.service b/systemd/system/wpeframework-playerinfo.service
+--- a/systemd/system/wpeframework-playerinfo.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-playerinfo.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework PlayerInfo Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service dsmgr.service
++After=wpeframework.service iarmbusd.service dsmgr.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-remotecontrol.service b/systemd/system/wpeframework-remotecontrol.service
+--- a/systemd/system/wpeframework-remotecontrol.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-remotecontrol.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework RemoteControl Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service ctrlm-main.service
++After=wpeframework.service iarmbusd.service ctrlm-main.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-secmanager.service b/systemd/system/wpeframework-secmanager.service
+--- a/systemd/system/wpeframework-secmanager.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-secmanager.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework SecManager Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service
++After=wpeframework.service iarmbusd.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-system.service b/systemd/system/wpeframework-system.service
+--- a/systemd/system/wpeframework-system.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-system.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework System Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service sysmgr.service mfrmgr.service deepsleepmgr.service pwrmgr.service 
++After=wpeframework.service iarmbusd.service sysmgr.service mfrmgr.service deepsleepmgr.service pwrmgr.service 
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-telemetry.service b/systemd/system/wpeframework-telemetry.service
+--- a/systemd/system/wpeframework-telemetry.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-telemetry.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework Telemetry Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service
++After=wpeframework.service iarmbusd.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-voicecontrol.service b/systemd/system/wpeframework-voicecontrol.service
+--- a/systemd/system/wpeframework-voicecontrol.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-voicecontrol.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework VoiceControl Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service ctrlm-main.service
++After=wpeframework.service iarmbusd.service ctrlm-main.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-wifi.service b/systemd/system/wpeframework-wifi.service
+--- a/systemd/system/wpeframework-wifi.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-wifi.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework Wifi Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service netsrvmgr.service
++After=wpeframework.service iarmbusd.service netsrvmgr.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+diff -upr a/systemd/system/wpeframework-xcast.service b/systemd/system/wpeframework-xcast.service
+--- a/systemd/system/wpeframework-xcast.service	2023-06-29 05:12:25.997616197 +0300
++++ b/systemd/system/wpeframework-xcast.service	2023-06-29 05:13:07.690525011 +0300
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=WPEFramework Xcast Initialiser
+-Requires=wpeframework.service
+-After=wpeframework.service
++Requires=wpeframework.service iarmbusd.service pwrmgr.service xdial.service 
++After=wpeframework.service iarmbusd.service pwrmgr.service xdial.service 
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes

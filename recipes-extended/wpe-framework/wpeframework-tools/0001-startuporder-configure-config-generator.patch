@@ -1,0 +1,53 @@
+diff --git a/Tools/ConfigGenerator/params.config b/Tools/ConfigGenerator/params.config
+index 7b389016..996c9628 100644
+--- a/Tools/ConfigGenerator/params.config
++++ b/Tools/ConfigGenerator/params.config
+@@ -1,6 +1,7 @@
+ autostart
+ precondition
+ resumed
++startuporder
+ terminations
+ callsign
+ persistentpathpostfix
+
+diff --git a/Tools/JsonGenerator/JsonGenerator.py b/Tools/JsonGenerator/JsonGenerator.py
+index e2ca4f35..6954b6ff 100755
+--- a/Tools/JsonGenerator/JsonGenerator.py
++++ b/Tools/JsonGenerator/JsonGenerator.py
+@@ -3397,6 +3397,10 @@ def CreateDocument(schema, path):
+                         "type": "boolean",
+                         "description": "Determines if the plugin shall be started automatically along with the framework"
+                     }
++                    commonConfig["startuporder"] = {
++                        "type": "integer",
++                        "description": "The plugin shall be started automatically along with the framework based on startuporder"
++                    }
+
+                 required = []
+                 if "configuration" in schema:
+@@ -3409,7 +3413,7 @@ def CreateDocument(schema, path):
+                 totalConfig["type"] = "object"
+                 totalConfig["properties"] = commonConfig2
+                 if "configuration" not in schema or ("nodefault" not in schema["configuration"] or not schema["configuration"]["nodefault"]):
+-                    totalConfig["required"] = ["callsign", "classname", "locator", "autostart"] + required
++                    totalConfig["required"] = ["callsign", "classname", "locator", "autostart", "startuporder"] + required
+
+                 ParamTable("", totalConfig)
+
+diff --git a/Tools/cmake/FindConfigGenerator.cmake.in b/Tools/cmake/FindConfigGenerator.cmake.in
+index 00dc9141..72850de0 100644
+--- a/Tools/cmake/FindConfigGenerator.cmake.in
++++ b/Tools/cmake/FindConfigGenerator.cmake.in
+@@ -223,6 +223,10 @@ if(CMAKE_VERSION VERSION_LESS 3.20.0 AND LEGACY_CONFIG_GENERATOR)
+                     map_append(${plugin_config} resumed ${resumed})
+                 endif()
+
++               if (NOT ${startuporder} STREQUAL "")
++                    map_append(${plugin_config} startuporder ${startuporder})
++                endif()
++
+                 if (NOT ${persistentpathpostfix} STREQUAL "")
+                     map_append(${plugin_config} persistentpathpostfix ${persistentpathpostfix})
+                     unset(persistentpathpostfix)
+

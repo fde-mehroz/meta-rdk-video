@@ -1,5 +1,5 @@
 SUMMARY = "Build Evergreen Cobalt Core library from source code. Use for debug and development puroposes."
-HOMEPAGE = "https://cobalt.googlesource.com/"
+HOMEPAGE = "https://cobalt.dev"
 
 LICENSE = "BSD-3-Clause & Apache-2.0-with-LLVM-exception"
 LIC_FILES_CHKSUM = " \
@@ -10,11 +10,11 @@ TOOLCHAINS_DIR = "starboard-toolchains"
 CLANG_BUILD_REVISION = "365097-f7e52fbd-8"
 CLANG_BUILD_SUBDIR = "${TOOLCHAINS_DIR}/x86_64-linux-gnu-clang-chromium-${CLANG_BUILD_REVISION}"
 
-SRC_URI  = "git://cobalt.googlesource.com/cobalt.git;protocol=https;name=cobalt;branch=23.lts.stable"
+SRC_URI  = "git://github.com/youtube/cobalt.git;protocol=https;name=cobalt;branch=23.lts.stable"
 SRC_URI += "https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-${CLANG_BUILD_REVISION}.tgz;subdir=${CLANG_BUILD_SUBDIR};name=clang"
 
-PV = "3.4.6"
-SRCREV_cobalt = "23.lts.4"
+PV = "3.5.6"
+SRCREV_cobalt = "23.lts.5"
 do_fetch[vardeps] += " SRCREV_FORMAT SRCREV_cobalt"
 
 SRC_URI[clang.sha256sum] = "3adf7a2338e86c202527f6bfaa945697eb2189b8965f7598d9d1159a195dbd51"

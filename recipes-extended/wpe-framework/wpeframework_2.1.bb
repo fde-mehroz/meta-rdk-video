@@ -12,7 +12,7 @@ DEPENDS +=  "${@bb.utils.contains('DISTRO_FEATURES', 'rdk_svp', 'gst-svp-ext', '
 
 SRC_URI = "git://github.com/rdkcentral/Thunder.git;protocol=git;branch=R2;name=thunder"
 
-# Sep 29, 2022, 82d4791478934292f7260fef233b9743fa34d88e
+# Jun 30, 2023
 SRCREV_thunder = "${THUNDER_RELEASE_TAG_NAME}"
 
 SRC_URI += "file://r2/0003-OCDM-increase-RPC-comm-timeout.patch \
@@ -27,13 +27,9 @@ SRC_URI += "file://r2/0003-OCDM-increase-RPC-comm-timeout.patch \
            file://r2/0001-Support-negative-numbers-with-write_config.patch \
            file://r2/LLAMA-2254_fix_netlink_buffer_size_error.patch \
            file://r2/0001-RDKTV-15393-clock_gettime.patch \
-           file://r2/0005-DELIA-58939-Webprocess-crash.patch \
-           file://r2/0001-Thunder_json_quoted_string_parsing_fix.patch \
-           file://r2/0001-SERVICES-Starting-multiples-services-concurrently-mi.patch \
            file://r2/0001-DEADLOCK-Deadlock-prevention-by-locking-the-ServiceA.patch \
            file://r2/0001-DEADLOCK-Next-to-closing-the-deadlock-on-the-open-of.patch \
            file://r2/to_add_protocols_pkgconfig_sdk.patch \
-           file://r2/0001-Merge-pull-request-705-from-Karthick-Somasundaresan-.patch \
            file://r2/0006-Increase-buffer-size-of-COMRPC-messages.patch \
            file://r2/0007-Make-size-type-of-Core-Frame-Text-configurable.patch \
            file://r2/0008-Fix-calculation-of-handled-size.patch \
@@ -56,6 +52,9 @@ PACKAGECONFIG ?= " \
     "
 
 PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'DOBBY_CONTAINERS','processcontainers processcontainers_dobby', '',d)}"
+
+PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'thunder_startup_services', 'com pluginactivator', '', d)}"
+PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'wpeframework_systemd_notify', 'sdnotify', '', d)}"
 
 # Buildtype
 # Maybe we need to couple this to a Yocto feature
@@ -80,6 +79,13 @@ PACKAGECONFIG[processcontainers_dobby]    = "-DPROCESSCONTAINERS_DOBBY=ON,,dobby
 PACKAGECONFIG[websource]       = "-DPLUGIN_WEBSERVER=ON,,"
 PACKAGECONFIG[webkitbrowser]   = "-DPLUGIN_WEBKITBROWSER=ON,,"
 PACKAGECONFIG[websocket]       = "-DWEBSOCKET=ON,,"
+
+PACKAGECONFIG[com] = "-DCOM=ON,,,"
+PACKAGECONFIG[pluginactivator] = "-DBUILD_PLUGIN_ACTIVATOR=ON,,,"
+PACKAGECONFIG[sdnotify] = ",,systemd,"
+
+SRC_URI += "${@bb.utils.contains('PACKAGECONFIG', 'pluginactivator', 'file://0001-RDKTV-15347-Add-PluginActivator-utility-for-systemd-.patch', '', d)}"
+SRC_URI += "${@bb.utils.contains('PACKAGECONFIG', 'sdnotify', 'file://wpeframework-sd_notify.patch ', '', d)}"
 
 # FIXME, determine this a little smarter
 # Provision event is required for libprovision and provision plugin
@@ -136,6 +142,12 @@ do_install_append() {
 
     install -d ${D}${sysconfdir}/wpeframework
     install -m 0644 ${WORKDIR}/WPEFramework.env ${D}${sysconfdir}/wpeframework
+}
+
+do_install_append() {
+    if [ "${@bb.utils.contains('PACKAGECONFIG', 'sdnotify', 'true', 'false', d)}" = "true" ]; then
+        sed -i -e 's/\[Service\]/\[Service\]\nType=notify/' ${D}${systemd_system_unitdir}/wpeframework.service
+    fi
 }
 
 SYSTEMD_SERVICE_${PN} = "wpeframework.service"

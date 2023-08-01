@@ -20,6 +20,9 @@ SRC_URI = "git://github.com/rdkcentral/ThunderInterfaces.git;protocol=git;branch
            file://r4/0101-IWatermark-Interface-In-R4.patch \
            file://0001-add-PersistLoadWatermark.patch \
            file://r4/0007-RDK-IDeviceInfo-Changes.patch \
+           file://r4/0110-OMWAPPI-910-Increase-subsamples-limit-for-4k-content_new.patch \
+           file://r4/JDolbyOutput.h \
+           file://r4/0001-Add-a-new-metrics-punch-through-on-the-OCDM-interface_4.2.patch \
            "
 
 #
@@ -46,6 +49,16 @@ do_install_append() {
         install -m 0644 ${D}${includedir}/WPEFramework/interfaces/IDRM.h ${D}${includedir}/cdmi.h
     fi
 }
+
+
+#########
+# FIXME # Mitigation to Thunder 4.2; Must be removed when upgraded to R4.3 & above   #
+#########
+do_install_append() {
+    install -m 0644 ${WORKDIR}/r4/JDolbyOutput.h ${D}${includedir}/WPEFramework/interfaces/json/JDolbyOutput.h
+}
+#########
+
 
 # ----------------------------------------------------------------------------
 

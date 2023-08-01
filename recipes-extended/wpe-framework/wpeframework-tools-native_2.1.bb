@@ -8,9 +8,6 @@ SRC_URI = "git://github.com/rdkcentral/Thunder.git;protocol=git;branch=R2;name=t
 # Sep 29, 2022, 82d4791478934292f7260fef233b9743fa34d88e
 SRCREV_thunder = "${THUNDER_RELEASE_TAG_NAME}"
 
-SRC_URI_append = " \
-                   file://0009-Generate-COM-RPC-ProxyStubs-that-support-large-strin.patch \
-                  "
 inherit cmake pkgconfig native python3native
 
 RDEPENDS_${PN} = "python3"

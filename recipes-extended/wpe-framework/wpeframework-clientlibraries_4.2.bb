@@ -17,6 +17,8 @@ SRC_URI = "git://github.com/rdkcentral/ThunderClientLibraries.git;protocol=git;b
            file://r4/R4.1_Trace_enabled_error_wpeframework_clientlibraries.patch \
            file://r4/0001-OCDM-enhancement-for-ocdm-adapter.patch \
            file://r4/R4.2_compilation_error_assert.patch \
+           file://0001-fixing-netflix-ocdm-playback-failure.patch \
+           file://r4/0001-Add-a-new-metrics-punch-through-on-the-OCDM-framework_4.2.patch \
            "
 
 # Sep 29, 2022

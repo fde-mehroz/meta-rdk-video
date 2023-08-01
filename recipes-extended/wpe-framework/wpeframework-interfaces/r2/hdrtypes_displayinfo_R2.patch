@@ -1,0 +1,52 @@
+diff --git a/jsonrpc/DisplayInfo.json b/jsonrpc/DisplayInfo.json
+index bb1938c..acb1906 100644
+--- a/jsonrpc/DisplayInfo.json
++++ b/jsonrpc/DisplayInfo.json
+@@ -6,19 +6,6 @@
+     "class": "DisplayInfo",
+     "description": "DisplayInfo JSON-RPC interface"
+   },
+-  "definitions": {
+-    "hdrtypes": {
+-      "type": "string",
+-      "enum": [
+-        "HDROff",
+-        "HDR10",
+-        "HDR10Plus",
+-        "HDRHlg",
+-        "HDRDolbyVision",
+-        "HDRTechnicolor"
+-      ]
+-    }
+-  },
+   "properties": {
+     "displayinfo": {
+       "summary": "Display general information",
+@@ -68,15 +55,9 @@
+           },
+           "hdrtype": {
+             "description": "HDR Type used",
+-            "$ref": "#/definitions/hdrtypes",
++            "type": "string",
++            "enum": [ "HDROff", "HDR10", "HDR10Plus", "HDRDolbyVision", "HDRTechnicolor" ],
+             "example": "HDROff"
+-          },
+-          "tvhdrtypes": {
+-            "description": "TV supported HDR types",
+-            "type": "array",
+-            "items": {
+-              "$ref": "#/definitions/hdrtypes"
+-            }
+           }
+         },
+         "required": [
+@@ -87,8 +68,7 @@
+           "width",
+           "height",
+           "hdcpprotection",
+-          "hdrtype",
+-          "tvhdrtypes"
++          "hdrtype"
+         ]
+       }
+     }

@@ -5,6 +5,7 @@ require include/thunder.inc
 
 
 SRC_URI = "git://github.com/rdkcentral/Thunder.git;protocol=git;branch=R4"
+SRC_URI += "file://0001-startuporder-configure-config-generator.patch"
 
 SRCREV = "R4.2"
 #SRCREV = "${THUNDER_RELEASE_TAG_NAME}"
