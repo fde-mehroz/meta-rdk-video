@@ -1,7 +1,7 @@
 SUMMARY = "A high-performance, small-footprint platform that implements a subset of HTML5/CSS/JS to run applications, including the YouTube TV app"
 HOMEPAGE = "https://cobalt.googlesource.com/"
 
-LICENSE = "BSD-3-Clause & Apache-2.0"
+LICENSE = "BSD-3-Clause & Apache-2.0-with-LLVM-exception"
 LIC_FILES_CHKSUM = " \
     file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d \
     file://../starboard/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
