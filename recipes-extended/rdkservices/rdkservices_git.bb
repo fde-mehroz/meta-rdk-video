@@ -29,8 +29,8 @@ SRC_URI = "git://github.com/rdkcentral/rdkservices.git;protocol=git;branch=main 
            file://0002-Adding-Support-For-R4.patch \
           "
 
-# July 27 2023
-SRCREV = "064c30dd1e3c5a0b7e1622d025c0763231c3b559"
+# Aug 02 2023
+SRCREV = "bd88c1be00b60ed1a515195b3619bd80b908906b"
 
 TOOLCHAIN = "gcc"
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'wpe_r4', ' -DUSE_THUNDER_R4=ON', '', d)}"
